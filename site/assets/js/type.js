@@ -12,6 +12,7 @@
     "TS": -0.012, "AV": -0.03, "VA": -0.03, "LY": -0.05, "PA": -0.025, "FA": -0.02,
     "Da": -0.02, "La": -0.035, "Pa": -0.015, "Fa": -0.02, "Ta": -0.02, "Va": -0.02,
     "Yo": -0.015, "Ve": -0.015, "We": -0.01, "ry": -0.01, "rv": -0.008, "f.": -0.02,
+    "ER": 0.005, "RR": 0.01, "RA": -0.012, "Th": -0.015, "St": -0.005, "Ye": -0.015, "NI": 0.01,
     "r.": -0.03, "r,": -0.03, "y.": -0.02, "y,": -0.02
   };
 
@@ -50,6 +51,8 @@
 
   // Bind the last two words of a block with a no-break space so no line ends
   // on a single stranded word. Text-node aware, so markup inside survives.
+  var FACTOR = 0.72; // before web fonts load, fallback metrics differ; stay cautious
+
   function widont(el) {
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
     var last = null;
@@ -67,11 +70,11 @@
     MEASURE.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
     // A hyphen stays a break opportunity, so only the part after it must fit.
     var unit = words.slice(-2).join(" ").replace(/^.*-(?=[^-]*\s)/, "");
-    if (!avail || MEASURE.measureText(unit).width > avail * 0.72) return;
+    if (!avail || MEASURE.measureText(unit).width > avail * FACTOR) return false;
     var d = last.data.replace(/\s+$/, "");
     var idx = d.lastIndexOf(" ");
-    if (idx > 0) { last.data = d.slice(0, idx) + " " + d.slice(idx + 1); return; }
-    if (idx === 0) { last.data = " " + d.slice(1); return; }
+    if (idx > 0) { last.data = d.slice(0, idx) + " " + d.slice(idx + 1); return true; }
+    if (idx === 0) { last.data = " " + d.slice(1); return true; }
     // Last text node is a single word: fix the space at the end of the previous node.
     var prev = null;
     walker.currentNode = el;
@@ -81,8 +84,14 @@
 
   // Keep short hyphenated compounds (e.g. "sovereignty-centered") from breaking at the
   // hyphen; the fonts carry no non-breaking hyphen glyph, so a no-wrap span is used.
+  var MONTHS = /\b(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})\b/g;
+
   function compounds(el) {
+    // Keep "December 2026" together.
+    var tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    for (var t0 = tw.nextNode(); t0; t0 = tw.nextNode()) if (MONTHS.test(t0.data)) { MONTHS.lastIndex = 0; t0.data = t0.data.replace(MONTHS, "$1 $2"); }
     var tail = el.textContent.trim().split(/\s+/).slice(-2).join(" ");
+    if (tail.length <= 20) tail = ""; // a short closing phrase may stay whole
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
     var nodes = [];
     for (var n = walker.nextNode(); n; n = walker.nextNode()) if (/\w-\w/.test(n.data)) nodes.push(n);
@@ -111,11 +120,17 @@
     for (var k = 0; k < cp.length; k++) if (!cp[k].hasAttribute("data-cp")) { compounds(cp[k]); cp[k].setAttribute("data-cp", ""); }
     // Orphan control first (whole words), then kerning (which splits text nodes).
     var p = root.querySelectorAll("p, li, dd, figcaption, .lede, h2, h3");
-    for (var j = 0; j < p.length; j++) if (!p[j].hasAttribute("data-wido")) { widont(p[j]); p[j].setAttribute("data-wido", ""); }
+    for (var j = 0; j < p.length; j++) if (!p[j].hasAttribute("data-wido")) p[j].setAttribute("data-wido", widont(p[j]) ? "1" : "0");
     var d = root.querySelectorAll("h1, h2, h3, .display, .kern");
     for (var i = 0; i < d.length; i++) if (!d[i].hasAttribute("data-kerned")) { kern(d[i]); d[i].setAttribute("data-kerned", ""); }
   }
 
   window.TERRAType = { run: run, kern: kern, widont: widont };
   run(document);
+  // Second pass with the real font metrics: endings skipped before the fonts loaded get another try.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+    FACTOR = 0.97; // real metrics now: any unit narrower than its box cannot overflow
+    var rest = document.querySelectorAll('[data-wido="0"]');
+    for (var i = 0; i < rest.length; i++) if (widont(rest[i])) rest[i].setAttribute("data-wido", "1");
+  });
 })();

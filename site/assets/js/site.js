@@ -16,13 +16,34 @@
       var open = nav.classList.toggle("open");
       btn.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    var closeMenu = function () { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); };
     nav.addEventListener("click", function (e) {
-      if (e.target.closest("a")) { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }
+      var a = e.target.closest("a");
+      if (!a) return;
+      closeMenu();
+      // Land focus on the section heading so keyboard users continue from there.
+      var sec = document.getElementById(a.getAttribute("href").slice(1));
+      var h = sec && sec.querySelector("h2, h1");
+      if (h) { h.setAttribute("tabindex", "-1"); setTimeout(function () { h.focus({ preventScroll: true }); }, 0); }
+    });
+    nav.addEventListener("focusout", function (e) {
+      if (nav.classList.contains("open") && !nav.contains(e.relatedTarget) && e.relatedTarget !== btn) closeMenu();
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && nav.classList.contains("open")) { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); btn.focus(); }
     });
   }
+
+  /* ---------------------------------------------------- countdown to the projected release candidates */
+  // The static figure counts from the newest record (10/05/2026); in a browser it counts from today.
+  $$("[data-countdown]").forEach(function (el) {
+    var p = el.getAttribute("data-countdown").split("-");
+    var target = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+    var now = new Date();
+    var today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    var d = Math.round((target - today) / 86400000);
+    el.textContent = String(Math.max(0, d));
+  });
 
   /* ---------------------------------------------------- current section in nav */
   if ("IntersectionObserver" in window) {
@@ -87,11 +108,21 @@
   var data = {};
   try { data = JSON.parse(($("#conv-data") || {}).textContent || "{}"); } catch (e) { data = {}; }
   if (stage) {
-    $$(".conv-toggle button", stage).forEach(function (b) {
-      b.addEventListener("click", function () {
-        stage.setAttribute("data-state", b.getAttribute("data-set"));
-        $$(".conv-toggle button", stage).forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+    // Planned lines fade in one after another; they never move and never turn solid.
+    $$(".proj", stage).forEach(function (g) {
+      Array.prototype.forEach.call(g.children, function (el, i) { el.style.setProperty("--i", i); });
+    });
+    // In "Today" the planned layer is a faint ghost: hidden from assistive technology too.
+    var setState = function (st) {
+      stage.setAttribute("data-state", st);
+      $$(".proj, .stamp-proj", stage).forEach(function (g) {
+        if (st === "proj") g.removeAttribute("aria-hidden"); else g.setAttribute("aria-hidden", "true");
       });
+      $$(".conv-toggle button", stage).forEach(function (o) { o.setAttribute("aria-pressed", o.getAttribute("data-set") === st ? "true" : "false"); });
+    };
+    setState(stage.getAttribute("data-state") || "now");
+    $$(".conv-toggle button", stage).forEach(function (b) {
+      b.addEventListener("click", function () { setState(b.getAttribute("data-set")); });
     });
     var info = $(".conv-info", stage);
     var hint = info ? info.innerHTML : "";
@@ -206,7 +237,11 @@
       f.setAttribute("allow", "fullscreen");
       slot.insertBefore(f, slot.firstChild);
       slot.hidden = false;
+      var st = slot.querySelector(".embed-status");
+      f.addEventListener("load", function () { if (st) st.textContent = st.getAttribute("data-loaded") || ""; });
+      b.setAttribute("aria-disabled", "true");
       b.disabled = true;
+      f.focus();
     });
   });
 
