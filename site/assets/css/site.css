@@ -162,7 +162,7 @@
 .station { fill: var(--ground); stroke: var(--fog-2); stroke-width: 2; stroke-dasharray: 3 3; }
 .station-label, .end-label { fill: var(--text-2); font-size: 15px; }
 .end-label { font-family: var(--display); font-weight: 600; font-size: 16px; fill: var(--text); }
-.end-label.sub { font-family: var(--body); font-weight: 400; font-size: 13px; fill: var(--text-2); }
+.end-label.sub { font-family: var(--body); font-weight: 500; font-size: 13px; fill: var(--text-2); }
 .end-ring { fill: none; stroke: var(--fog); stroke-width: 2; stroke-dasharray: 3 4; }
 .node { cursor: pointer; }
 .node .hit { fill: transparent; }
