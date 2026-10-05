@@ -401,11 +401,7 @@
 .foot-links { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
 .foot-links a { color: var(--text-2); display: inline-block; padding-block: 0.35rem; }
 
-/* ------------------------------------------------------------ reveal (enhancement only) */
-@media (prefers-reduced-motion: no-preference) {
-  .js .rv { opacity: 0; transform: translateY(14px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  .js .rv.in { opacity: 1; transform: none; }
-}
+/* ------------------------------------------------------------ reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
@@ -434,7 +430,6 @@
   .plate { break-before: auto; }
   h2, h3, h4 { break-after: avoid; }
   .proj > * { opacity: 1 !important; }
-  .rv { opacity: 1 !important; transform: none !important; }
   .conv-narrow { display: none !important; } .conv-wide { display: block !important; }
   .node-label, .tsdf-label, .station-label, .end-label, .tier-label { fill: #000; }
   .paper { background: #fff; }

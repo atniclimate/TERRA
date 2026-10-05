@@ -304,19 +304,7 @@
     tiers.concat(items).forEach(function (el) {
       el.addEventListener("mouseenter", function () { hl(el.getAttribute("data-tier")); });
     });
-    if ("IntersectionObserver" in window && !RM.matches) {
-      var once = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { once.disconnect(); setTimeout(play, 400); } }, { threshold: 0.5 });
-      once.observe(fig);
-    } else finalState();
-  }
-
-  /* ---------------------------------------------------- gentle reveal */
-  if ("IntersectionObserver" in window && !RM.matches) {
-    var rv = $$(".sec-head, .figures, .obj, .princ li, .t-item");
-    rv.forEach(function (el) { el.classList.add("rv"); });
-    var ro = new IntersectionObserver(function (en) {
-      en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); } });
-    }, { rootMargin: "0px 0px -8% 0px" });
-    rv.forEach(function (el) { ro.observe(el); });
+    // The request plays only when asked; with reduced motion the figure shows its final state.
+    if (RM.matches) finalState();
   }
 })();
