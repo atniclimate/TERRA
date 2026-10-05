@@ -21,4 +21,4 @@ Then open http://localhost:8080. The site is plain HTML, CSS and JavaScript with
 
 - Fonts: League Spartan and Poppins, SIL Open Font License 1.1 (license files in `site/assets/fonts/`).
 - Elevation contours: NOAA NGDC ETOPO1 Global Relief Model (Amante and Eakins, 2009).
-- Photographs of the Pacific Northwest. No photograph is identified by place.
+- Photographs: Patrick Freeland. No photograph is identified by place, and all metadata is removed from the published copies.
