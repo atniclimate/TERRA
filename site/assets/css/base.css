@@ -34,7 +34,12 @@
   --plum: #6e4a5c;      /* aurora-shore: magenta band */
   --forest: #111814;    /* dusk-valley: tree line */
   --earth: #60492c;     /* gold-strait: shore */
-  --red: #f26b5e;       /* ATNI Red on dark, rare accent only */
+  /* ATNI institutional structure and action (docs/visual-contract.md, D30) */
+  --atni-red: #e13d33;      /* rules, marks, active state, gates */
+  --red-on-dark: #f26b5e;   /* small red text, eyebrows, focus ring (6.6:1 on ground) */
+  --red-alt: #b02821;       /* primary button and skip link, white text 6.6:1 */
+  --red-alt-hover: #8c1f19;
+  --red: var(--red-on-dark);
 
   /* Paper ground for ledger sections (overcast-water, lightened) */
   --paper: #ece7dc;
@@ -83,9 +88,10 @@ img, svg, picture { display: block; max-width: 100%; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+/* Gold marks dated evidence only; focus, selection and navigation are institutional (ATNI red). */
+:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 3px; }
 .paper :focus-visible { outline-color: var(--ink); }
-::selection { background: var(--gold); color: var(--ground); }
+::selection { background: var(--red-alt); color: #ffffff; }
 
 h1, h2, h3, h4, .display {
   font-family: var(--display); font-weight: 600; margin: 0;
@@ -99,14 +105,14 @@ h4 { font-size: 1.125rem; line-height: 1.25; letter-spacing: 0; }
 p, li, dd, figcaption { text-wrap: pretty; }
 p { margin: 0 0 1lh; max-width: var(--measure); }
 .lede { font-family: var(--display); font-weight: 500; font-size: var(--fs-lede); line-height: 1.38; letter-spacing: -0.005em; max-width: 46ch; color: var(--text-2); text-wrap: pretty; }
-.eyebrow { font-family: var(--display); font-weight: 500; font-size: var(--fs-label); letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.3; color: var(--gold); margin: 0 0 1.1rem; }
+.eyebrow { font-family: var(--display); font-weight: 500; font-size: var(--fs-label); letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.3; color: var(--red-on-dark); margin: 0 0 1.1rem; }
 .small { font-size: var(--fs-small); line-height: 1.55; }
 .k { letter-spacing: calc(var(--k, 0) * 1em + var(--track, 0em)); }
 .caps { text-transform: none; letter-spacing: 0.012em; }
 .nw { white-space: nowrap; }
 
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.skip { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--gold); color: var(--ground); padding: 0.6rem 1rem; font-weight: 600; }
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--red-alt); color: #ffffff; padding: 0.6rem 1rem; font-weight: 600; }
 .skip:focus { top: 1rem; }
 
 [id] { scroll-margin-top: 4.5rem; }
@@ -115,4 +121,4 @@ time { font-variant-numeric: tabular-nums; }
 .section { padding-block: var(--section); position: relative; }
 .paper { background: var(--paper); color: var(--ink); font-weight: 400; }
 .paper .lede { color: var(--ink-2); }
-.paper .eyebrow { color: var(--gold-ink); }
+.paper .eyebrow { color: var(--red-alt); } /* 5.3:1 on paper */
