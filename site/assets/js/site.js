@@ -118,6 +118,9 @@
       $$(".proj, .stamp-proj", stage).forEach(function (g) {
         if (st === "proj") g.removeAttribute("aria-hidden"); else g.setAttribute("aria-hidden", "true");
       });
+      $$(".stamp-now", stage).forEach(function (g) {
+        if (st === "proj") g.setAttribute("aria-hidden", "true"); else g.removeAttribute("aria-hidden");
+      });
       $$(".conv-toggle button", stage).forEach(function (o) { o.setAttribute("aria-pressed", o.getAttribute("data-set") === st ? "true" : "false"); });
     };
     setState(stage.getAttribute("data-state") || "now");
@@ -145,7 +148,17 @@
     var clear = function () {
       stage.classList.remove("focus");
       $$(".on", stage).forEach(function (n) { n.classList.remove("on"); });
+      showDefault();
     };
+    // With nothing selected the panel shows the one publicly deployed application, plus the hint.
+    var showDefault = function () {
+      var d = data.ddm;
+      if (!info || !d) return;
+      info.className = "conv-info acc-" + d.accent;
+      info.innerHTML = "<h4>" + esc(d.name) + "</h4><p><b>" + esc(d.stage) + "</b> · " + esc(data._labels.newest) + " " + esc(d.record) + "</p>" +
+        "<p>" + esc(d.kind) + ": " + esc(d.spring) + "</p>" + hint;
+    };
+    showDefault();
     $$(".node", stage).forEach(function (n) {
       var id = n.getAttribute("data-node");
       n.addEventListener("mouseenter", function () { focusNode(id); });
@@ -249,34 +262,37 @@
   var fig = $(".tiers-fig");
   if (fig) {
     var dot = $(".req-dot", fig), win = $(".window", fig), tile = $(".view-tile", fig), cap = $(".t3-cap", fig);
-    var svgW = 560;
+    var svg = $(".tiers-svg", fig);
+    var E1 = +svg.getAttribute("data-e1"), E2 = +svg.getAttribute("data-e2"), E3 = +svg.getAttribute("data-e3"), START = +svg.getAttribute("data-start");
+    var STOP = E3 + 10, TILE0 = E2 - 10, TILE1 = START - 24;
     var tiers = $$(".tier", fig), items = $$(".tier-item");
     var hl = function (t) {
       tiers.forEach(function (r) { r.classList.toggle("hl", r.getAttribute("data-tier") === t); });
       items.forEach(function (r) { r.classList.toggle("hl", r.getAttribute("data-tier") === t); });
     };
     var finalState = function () {
-      dot.setAttribute("cx", String(svgW / 2 + 64));
+      dot.setAttribute("cx", String(STOP));
       dot.style.opacity = "0.35";
       win.style.opacity = "1";
       tile.style.opacity = "1";
-      tile.setAttribute("x", String(svgW - 34));
+      tile.setAttribute("x", String(TILE1));
       if (cap) cap.style.opacity = "1";
       hl("t3");
     };
     var play = function () {
       if (RM.matches || !dot.animate) { finalState(); return; }
-      dot.style.opacity = "1"; win.style.opacity = "0"; tile.style.opacity = "0"; tile.setAttribute("x", String(svgW - 160)); hl("t0");
-      var start = svgW - 14, stop = svgW / 2 + 64, dur = 3600, t = performance.now();
+      dot.style.opacity = "1"; win.style.opacity = "0"; tile.style.opacity = "0"; tile.setAttribute("x", String(TILE0)); hl("t0");
+      var start = START, stop = STOP, dur = 3600, t = performance.now();
       var step = function (now) {
         var u = Math.min(1, (now - t) / dur), x = start + (stop - start) * (1 - Math.pow(1 - u, 2));
         dot.setAttribute("cx", x.toFixed(1));
-        var tier = x > svgW - 80 ? "t0" : x > svgW - 150 ? "t1" : x > svgW - 220 ? "t2" : "t3";
+        var tier = x > E1 ? "t0" : x > E2 ? "t1" : x > E3 + 12 ? "t2" : "t3";
         hl(tier);
-        if (x < svgW - 150) {
+        // Past the T2 edge a view travels back out through the window; the data stays.
+        if (x < E2) {
           win.style.opacity = "1"; tile.style.opacity = "1";
-          var v = Math.min(1, (svgW - 150 - x) / 70);
-          tile.setAttribute("x", (svgW - 160 + v * 126).toFixed(1));
+          var v = Math.min(1, (E2 - x) / Math.max(1, E2 - STOP));
+          tile.setAttribute("x", (TILE0 + v * (TILE1 - TILE0)).toFixed(1));
         }
         if (u < 1) requestAnimationFrame(step);
         else { dot.animate([{ opacity: 1 }, { opacity: 0.35 }], { duration: 700, fill: "forwards" }); }

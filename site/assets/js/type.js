@@ -88,7 +88,9 @@
 
   function compounds(el) {
     // Keep "December 2026" together.
-    var tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    // Dates set in their own <time> column stay free to wrap.
+    var skipTime = { acceptNode: function (n) { return n.parentElement && n.parentElement.closest("time") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } };
+    var tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, skipTime);
     for (var t0 = tw.nextNode(); t0; t0 = tw.nextNode()) if (MONTHS.test(t0.data)) { MONTHS.lastIndex = 0; t0.data = t0.data.replace(MONTHS, "$1 $2"); }
     var tail = el.textContent.trim().split(/\s+/).slice(-2).join(" ");
     if (tail.length <= 20) tail = ""; // a short closing phrase may stay whole
