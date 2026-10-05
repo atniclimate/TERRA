@@ -94,6 +94,10 @@
     for (var t0 = tw.nextNode(); t0; t0 = tw.nextNode()) if (MONTHS.test(t0.data)) { MONTHS.lastIndex = 0; t0.data = t0.data.replace(MONTHS, "$1 $2"); }
     var tail = el.textContent.trim().split(/\s+/).slice(-2).join(" ");
     if (tail.length <= 20) tail = ""; // a short closing phrase may stay whole
+    // A compound may only be held whole when it is narrow next to its block (large text, narrow screens).
+    var ecs = getComputedStyle(el);
+    MEASURE.font = ecs.fontStyle + " " + ecs.fontWeight + " " + ecs.fontSize + " " + ecs.fontFamily;
+    var room = el.clientWidth * 0.5;
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
     var nodes = [];
     for (var n = walker.nextNode(); n; n = walker.nextNode()) if (/\w-\w/.test(n.data)) nodes.push(n);
@@ -101,7 +105,7 @@
       var re = /([A-Za-z0-9.]+(?:-[A-Za-z0-9]+)+)/g, t = node.data, last = 0, m, frag = document.createDocumentFragment(), hit = false;
       while ((m = re.exec(t))) {
         // Long compounds, and compounds in the closing words, stay free to break at the hyphen.
-        if (m[0].length > 21 || tail.indexOf(m[0]) !== -1) continue;
+        if (m[0].length > 21 || tail.indexOf(m[0]) !== -1 || !room || MEASURE.measureText(m[0]).width > room) continue;
         hit = true;
         frag.appendChild(document.createTextNode(t.slice(last, m.index)));
         var s = document.createElement("span");

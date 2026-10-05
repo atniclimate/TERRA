@@ -81,7 +81,7 @@ body {
   margin: 0; background: var(--ground); color: var(--text);
   /* ATNI Design System: body weight one step up on dark (Poppins 500); paper keeps 400. */
   font: 500 var(--fs-body)/1.65 var(--body);
-  font-kerning: normal; font-synthesis: none;
+  font-kerning: normal; font-synthesis: none; overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 img, svg, picture { display: block; max-width: 100%; }
