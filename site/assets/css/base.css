@@ -1,0 +1,113 @@
+/* TERRA showcase: foundation (fonts, tokens, type). Colors are sampled from the
+   Pacific Northwest photographs used on this site; ATNI design-system ground and
+   text tokens are kept. No bright or saturated blue. */
+
+@font-face { font-family: "League Spartan"; src: url("../fonts/league-spartan-var.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("../fonts/poppins-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("../fonts/poppins-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("../fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("../fonts/poppins-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+
+:root {
+  /* ATNI ground ladder and text */
+  --ground: #010b13;
+  --raised: #0b1219;
+  --overlay: #141b22;
+  --line: #26303a;
+  --text: #e8ecf0;
+  --text-2: #b9c0c6;
+  --text-3: #8f99a3;
+
+  /* Photo-sampled palette (source photo in comment) */
+  --gold: #daac24;      /* gold-strait: light through the cloud deck */
+  --gold-deep: #9e7323; /* gold-strait: lit water */
+  --amber: #d5a162;     /* basalt-sunset: sun glow */
+  --salmon: #c5836b;    /* basalt-sunset: lit cloud underside */
+  --apricot: #efc392;   /* dusk-valley: horizon glow */
+  --fog: #cfc9bb;       /* overcast-water: bright overcast */
+  --fog-2: #b1b1ac;     /* overcast-water: cloud body */
+  --stone: #959a9c;     /* overcast-water: water */
+  --fogblue: #798b95;   /* dusk-valley: valley mist (soft, low chroma) */
+  --lichen: #b8bb88;    /* aurora-shore: pale aurora */
+  --moss: #6e7941;      /* aurora-shore: green band */
+  --plum: #6e4a5c;      /* aurora-shore: magenta band */
+  --forest: #111814;    /* dusk-valley: tree line */
+  --earth: #60492c;     /* gold-strait: shore */
+  --red: #f26b5e;       /* ATNI Red on dark, rare accent only */
+
+  /* Paper ground for ledger sections (overcast-water, lightened) */
+  --paper: #ece7dc;
+  --paper-2: #e2dccf;
+  --ink: #15191d;
+  --ink-2: #474c51;
+  --ink-3: #575b5e;
+  --gold-ink: #6b4f17;  /* gold-strait shore tone, darkened for text on paper (6.2:1) */
+
+  /* Status grammar (shape + text, never hue alone) */
+  --st-exists: var(--gold);
+  --st-partial: var(--amber);
+  --st-synthetic: var(--fog-2);
+  --st-planned: var(--text-3);
+
+  /* Type */
+  --display: "League Spartan", "Futura", "Century Gothic", system-ui, sans-serif;
+  --body: "Poppins", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --fs-hero: clamp(4.5rem, 1.6rem + 14vw, 13rem);
+  --fs-h1: clamp(2.25rem, 1.2rem + 4.2vw, 4.75rem);
+  --fs-h2: clamp(1.875rem, 1.25rem + 2.6vw, 3.25rem);
+  --fs-h3: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+  --fs-lede: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);
+  --fs-body: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --fs-small: 0.875rem;
+  --fs-label: 0.8125rem;
+
+  --gutter: clamp(1.25rem, 0.6rem + 3.2vw, 4rem);
+  --max: 76rem;
+  --measure: 62ch;
+  --section: clamp(4.5rem, 2.5rem + 8vw, 10rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--ground); color: var(--text);
+  font: 400 var(--fs-body)/1.65 var(--body);
+  font-kerning: normal; font-synthesis: none;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+img, svg, picture { display: block; max-width: 100%; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.paper :focus-visible { outline-color: var(--ink); }
+::selection { background: var(--gold); color: var(--ground); }
+
+h1, h2, h3, h4, .display {
+  font-family: var(--display); font-weight: 600; margin: 0;
+  text-wrap: balance; hyphens: manual; overflow-wrap: break-word;
+  letter-spacing: -0.015em; line-height: 1.04;
+}
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); line-height: 1.06; }
+h3 { font-size: var(--fs-h3); line-height: 1.12; letter-spacing: -0.01em; }
+h4 { font-size: 1.125rem; line-height: 1.25; letter-spacing: 0; }
+p, li, dd, figcaption { text-wrap: pretty; }
+p { margin: 0 0 1lh; max-width: var(--measure); }
+.lede { font-family: var(--display); font-weight: 500; font-size: var(--fs-lede); line-height: 1.38; letter-spacing: -0.005em; max-width: 46ch; color: var(--text-2); text-wrap: pretty; }
+.eyebrow { font-family: var(--display); font-weight: 500; font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.3; color: var(--gold); margin: 0 0 1.1rem; }
+.small { font-size: var(--fs-small); line-height: 1.55; }
+.k { letter-spacing: calc(var(--k, 0) * 1em + var(--track, 0em)); }
+.caps { text-transform: none; letter-spacing: 0.012em; }
+.nw { white-space: nowrap; }
+
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--gold); color: var(--ground); padding: 0.6rem 1rem; font-weight: 600; }
+.skip:focus { top: 1rem; }
+
+.wrap { width: min(100% - 2 * var(--gutter), var(--max)); margin-inline: auto; }
+.section { padding-block: var(--section); position: relative; }
+.paper { background: var(--paper); color: var(--ink); }
+.paper .lede { color: var(--ink-2); }
+.paper .eyebrow { color: var(--gold-ink); }
