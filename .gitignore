@@ -1,0 +1,11 @@
+# Allowlist: only the published site (and its Pages workflow) is ever tracked.
+# Planning docs, prompts, agents, reference, assets/pnw-source, archive and scratch stay local.
+/*
+!/.gitignore
+!/site/
+!/.github/
+!/README.md
+!/LICENSE*
+node_modules/
+*.log
+.env*
