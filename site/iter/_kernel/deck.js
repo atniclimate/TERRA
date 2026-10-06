@@ -32,7 +32,9 @@
 
   // ---------------------------------------------------------------- routes
   function parse(hash) {
-    const h = decodeURIComponent((hash || '').replace(/^#/, ''));
+    let h;
+    try { h = decodeURIComponent((hash || '').replace(/^#/, '')); }
+    catch (e) { return null; }
     let m;
     if (!h) return { console: 'standby' };
     if (h[0] === '/') {
