@@ -1,0 +1,19 @@
+Copyright (c) 2026 Affiliated Tribes of Northwest Indians (ATNI). All rights reserved.
+
+The contents of this repository, including its code, text, design, and graphics, may not be
+copied, modified, distributed, or used without the prior written permission of ATNI, except
+where a third-party license listed below applies to a specific component.
+
+Photographs in site/assets/photos/ are copyright (c) Patrick Freeland. All rights reserved.
+
+Third-party components keep their own licenses:
+
+- League Spartan and Poppins fonts: SIL Open Font License 1.1
+  (site/assets/fonts/LeagueSpartan-OFL.txt, site/assets/fonts/Poppins-OFL.txt).
+- CesiumJS 1.114: Apache License 2.0 (site/assets/geobase3d/cesium/LICENSE.md).
+- Elevation contours: NOAA NGDC ETOPO1 Global Relief Model (Amante and Eakins, 2009).
+- 3D terrain: USGS 3D Elevation Program (3DEP), public domain.
+- Aerial imagery: USDA NAIP via USGS The National Map, public domain.
+- Wind resource layer: derived from the NREL WIND Toolkit and ESA WorldCover 2021
+  (contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium;
+  CC BY 4.0, https://creativecommons.org/licenses/by/4.0/).
