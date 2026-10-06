@@ -19,6 +19,7 @@ Then open http://localhost:8080. The site is plain HTML, CSS and JavaScript with
 
 ## Credits
 
+- Developed by Patrick A. Freeland for the Affiliated Tribes of Northwest Indians.
 - Fonts: League Spartan and Poppins, SIL Open Font License 1.1 (license files in `site/assets/fonts/`).
 - Elevation contours: NOAA NGDC ETOPO1 Global Relief Model (Amante and Eakins, 2009).
 - 3D terrain display: USGS 3DEP terrain; USDA NAIP imagery via USGS The National Map; wind resource layer from the NREL WIND Toolkit with ESA WorldCover 2021 (contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium; CC BY 4.0); CesiumJS, Apache License 2.0.
