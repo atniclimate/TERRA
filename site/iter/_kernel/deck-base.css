@@ -124,6 +124,8 @@ kbd { display: inline-block; min-width: 1.6rem; padding: 0.1rem 0.4rem; border: 
 .tr-nums { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; }
 .tr-nums li { display: flex; align-items: baseline; gap: 0.45rem; font-size: 0.9375rem; }
 .tr-nums b { font-size: 1.375rem; line-height: 1; color: var(--head); font-variant-numeric: tabular-nums; }
+.tr-key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.8125rem; color: var(--text-2); }
+.tr-key li { display: inline-flex; align-items: center; gap: 0.4rem; }
 .tr-leave { margin: 0; max-width: none; padding-left: 0.75rem; border-left: 3px solid var(--atni-red); font-family: var(--display); font-weight: 500; color: var(--head); }
 .d-rail { padding: 0.6rem var(--gutter); border-bottom: var(--deck-hair); }
 .d-rail ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; }
@@ -529,7 +531,7 @@ html { scroll-padding-top: 4.5rem; }
   .d-pad9 .mk { width: 0.625rem; height: 0.625rem; position: absolute; }
   .d-pad9 li { position: relative; }
   .d-pad9 .mk { top: 0.4rem; right: 0.4rem; }
-  .d-pad9 .p9-n { font-family: var(--display); font-weight: 600; font-size: 0.75rem; line-height: 1.1; overflow-wrap: anywhere; }
+  .d-pad9 .p9-n { font-family: var(--display); font-weight: 600; font-size: 0.75rem; line-height: 1.1; overflow-wrap: break-word; hyphens: auto; }
   .d-pad9 time { font-size: 0.75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .d-pad9 a[aria-current] { border-color: var(--atni-red); box-shadow: inset 0 -3px 0 var(--atni-red); }
   .d-pad9 a:hover { border-color: var(--text-2); }
