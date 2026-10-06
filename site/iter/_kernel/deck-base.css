@@ -315,6 +315,17 @@ html:not(.js) .d-ctrl, html:not(.js) .sy-stepper, html:not(.js) .lg-filter { dis
 .pad:hover { border-color: var(--text-2); }
 .panels { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
 .panel { padding: 1rem 1.1rem; border: 1px solid var(--line); background: var(--deck-glass); }
+/* GeoBase's 3D display (D47g): the still sits under the frame until the viewer paints. */
+.gb3d { margin: 0 0 1rem; }
+.gb3d-frame { position: relative; aspect-ratio: 16 / 9; max-height: 62vh; width: 100%; background: var(--ground); border: 1px solid var(--line); overflow: hidden; }
+.gb3d-still, .gb3d-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.gb3d-still { object-fit: cover; }
+.gb3d figcaption { margin-top: 0.5rem; }
+.gb3d-t { margin: 0 0 0.2rem; font-family: var(--display); font-weight: 600; font-size: 0.9375rem; color: var(--head); }
+.gb3d-c { margin: 0 0 0.3rem; font-size: 0.875rem; max-width: 70ch; }
+.gb3d-cr .nw { white-space: nowrap; }
+.gb3d-cr { margin: 0; font-size: 0.75rem; color: var(--text-2); max-width: 90ch; }
+@media (max-width: 30em) { .gb3d-frame { aspect-ratio: 4 / 3; } }
 .pn-h { margin: 0 0 0.75rem; display: flex; gap: 0.6rem; align-items: baseline; font-size: 1.0625rem; color: var(--head); }
 .pn-k { font-size: 0.8125rem; color: var(--red-on-dark); font-variant-numeric: tabular-nums; }
 .pn-status { display: block; }
@@ -625,6 +636,9 @@ html.js[data-station] .d-pad9, html.js[data-station] .d-foot, html.js[data-stati
   .bd-table, .ob-table, .panel, .t-item, .sv-princ li, .bay-cav, .bd-proj, .tl-datum { background: none !important; }
   .bd-table th, .bd-table td, .ob-table th, .ob-table td { border-color: #bbbbbb; }
   .panel { border-color: #bbbbbb; break-inside: avoid; }
+  .gb3d-frame iframe { display: none !important; }
+  .gb3d-frame { max-height: none; border-color: #bbbbbb; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .gb3d-t, .gb3d-c, .gb3d-cr { color: #222222 !important; }
   .t-item, .lg-row, .sv-tier, .fn, .bd-row { break-inside: avoid; }
   .bay { break-before: page; border: 0; }
   .bay:first-child { break-before: auto; }

@@ -380,6 +380,17 @@
   addEventListener('afterprint', () => { delete H.dataset.print; apply({}, { announce: false, instant: true }); });
   mqStage.addEventListener('change', () => apply({}, { announce: false, instant: true }));
 
+  // ---------------------------------------------------------------- embedded displays (D47g)
+  // A heavy embedded view (GeoBase's 3D display) loads only once its figure is shown and near
+  // the viewport; hidden consoles and panels never intersect, so nothing loads at rest elsewhere.
+  const lazyFrames = $$('iframe[data-src]');
+  if (lazyFrames.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) { e.target.src = e.target.dataset.src; io.unobserve(e.target); }
+    }, { rootMargin: '200px' });
+    for (const f of lazyFrames) io.observe(f);
+  } else for (const f of lazyFrames) f.src = f.dataset.src;
+
   // ---------------------------------------------------------------- start
   for (const b of $$('[data-set-view]')) b.setAttribute('aria-pressed', String(b.dataset.setView === H.dataset.view));
   if (H.dataset.mode === 'projected') setMode('projected');
