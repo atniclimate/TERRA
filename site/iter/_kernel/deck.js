@@ -261,6 +261,9 @@
     const t = e.target, k = e.key;
     if (e.ctrlKey || e.altKey || e.metaKey) return false;
     const inRail = t.closest('.d-rail a'), in9 = t.closest('.d-pad9 a'), inPad = t.closest('.pads a');
+    if (k === ' ' && (inRail || in9 || inPad)) {
+      e.preventDefault(); (inRail || in9 || inPad).click(); return true;
+    }
     if (inRail) {
       const items = $$('.d-rail a'), i = items.indexOf(inRail);
       const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[k];
