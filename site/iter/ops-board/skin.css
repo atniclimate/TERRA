@@ -1,0 +1,287 @@
+/* I-3 Ops Board: the Command Center translated (EXPLORE section 3).
+   One fixed shell; only the field changes. A grey ladder on ATNI black, square geometry, hairline
+   grids (1px gaps over the line colour), tracked League Spartan labels at 12 px or larger.
+   Colour means a tap acts: ATNI Red marks keys, the place you are and focus; gold stays the
+   base's record light. Photographs only on Standby and as a faint backplate. Nothing moves at rest. */
+
+html[data-skin="ops-board"] {
+  --ob-well: #060e15;
+  --ob-panel: #0b1219;
+  --ob-inv: #1f2831;      /* grey inversion for label chips: Text on Dark 12.9:1, Red on Dark 5.0:1 */
+  --ob-hair: #1a232c;
+  --ob-leader: #3a4550;   /* decorative leaders only, never text */
+  --ob-dots: radial-gradient(circle at 1px 1px, rgb(232 236 240 / 0.075) 1px, transparent 1.3px) 0 0 / 1.25rem 1.25rem;
+}
+html[data-skin="ops-board"] body { background: var(--ob-dots), var(--ground); }
+
+/* ------------------------------------------------------------------ both views */
+/* No orphans: let the browser balance the last line of every paragraph-like block. */
+html[data-skin="ops-board"] :is(p, li, dd, figcaption, td, th, .fn-t, .tp-t, .lk-t, .pad-s, .svc-n, .ob-sum, .bd-tile) { text-wrap: pretty; }
+html[data-skin="ops-board"] :is(h2, h3, h4) { text-wrap: balance; }
+/* Phones: a capability's text takes the full row under its mark and state, like a bare ledger row. */
+@media (max-width: 47.99em) {
+  html[data-skin="ops-board"] .fn .fn-t { grid-column: 1 / -1; }
+}
+
+/* Faint backplate: every photograph except Standby's sits under a near-opaque ATNI black veil and the static dot ground. */
+html[data-skin="ops-board"] .console:not(.c-standby) > .c-photo::after,
+html[data-skin="ops-board"] .bay > .c-photo::after { background: var(--ob-dots), rgb(1 11 19 / 0.9); }
+/* Page weight (1.3 MB on a full scroll): the nine bay backplates load only on the stage, where one bay shows at a time. */
+html[data-skin="ops-board"] .bay > .c-photo { display: none; }
+@media (min-width: 64em) and (min-height: 36em) { html.js[data-skin="ops-board"][data-view="stage"] .bay > .c-photo { display: block; } }
+
+/* Honest placeholder well: what this console does not show, said plainly. */
+html[data-skin="ops-board"] .console:not(.c-ledger) .c-notshown {
+  padding: 0.55rem 0.8rem; border: 1px dashed var(--line-ui); background: var(--ob-well);
+  font-size: 0.8125rem; color: var(--text-2);
+}
+
+/* Board: bays by evidence slots, bare rows on hairlines */
+html[data-skin="ops-board"] .bd-ratios { gap: 1px; background: var(--line); border: 1px solid var(--line); width: fit-content; max-width: 100%; }
+html[data-skin="ops-board"] .bd-ratios .ratio { padding: 0.45rem 0.9rem 0.5rem; background: var(--ob-panel); font-family: var(--display); font-weight: 500; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+html[data-skin="ops-board"] .bd-ratios .ratio b { font-size: 1.5rem; letter-spacing: 0; color: var(--head); }
+html[data-skin="ops-board"] .bd-table { background: rgb(1 11 19 / 0.9); border: 1px solid var(--line); }
+html[data-skin="ops-board"] .bd-table thead th { background: var(--ob-panel); border-bottom: 1px solid var(--line-ui); letter-spacing: 0.14em; }
+html[data-skin="ops-board"] .bd-dom th { background: var(--ob-inv); color: var(--text); padding-block: 0.4rem; letter-spacing: 0.16em; border-bottom: 0; }
+html[data-skin="ops-board"] .bd-ratios .ratio { flex: 1 1 auto; }
+@media (min-width: 48em) {
+  html[data-skin="ops-board"] .bd-row > * { border-bottom: 1px solid var(--line); }
+  html[data-skin="ops-board"] .bd-row > * + * { border-left: 1px solid var(--ob-hair); }
+}
+html[data-skin="ops-board"] .bd-app a:hover { color: var(--head); text-decoration: underline; text-underline-offset: 0.2em; }
+
+/* Pads: square keys, the digit in Red on Dark because pressing it acts; the place you are is a 2 px red frame. */
+html[data-skin="ops-board"] .pads { gap: 1px; background: var(--line); border: 1px solid var(--line); }
+html[data-skin="ops-board"] .pad { border: 0; background: var(--ob-panel); }
+html[data-skin="ops-board"] .pad-k { color: var(--red-on-dark); }
+html[data-skin="ops-board"] .pad-l { font-size: 0.75rem; letter-spacing: 0.14em; }
+html[data-skin="ops-board"] .pad:hover { background: var(--overlay); }
+html[data-skin="ops-board"] .pad[aria-current] { background: var(--overlay); box-shadow: inset 0 0 0 2px var(--atni-red); }
+html[data-skin="ops-board"] .pad:focus-visible { position: relative; z-index: 2; outline-offset: 2px; }
+
+/* Bare-row tape and panels: hairlines, no cards */
+html[data-skin="ops-board"] .panel { border-color: var(--line); background: rgb(1 11 19 / 0.88); }
+html[data-skin="ops-board"] .bay-cav { border-left-color: var(--line-ui); background: var(--ob-well); }
+
+/* ------------------------------------------------------------------ the stage: one fixed shell */
+@media (min-width: 64em) and (min-height: 36em) {
+  html.js[data-skin="ops-board"][data-view="stage"] {
+    /* The shell: header band (title block, status, nav tree), field, ledger column, pad housing, command line.
+       The grid gap is the hairline: every region sits on the ground over the line colour. */
+    & .deck {
+      grid-template-columns: minmax(0, 1fr) clamp(19rem, 25vw, 23.5rem);
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+      grid-template-areas: "status rail" "truths rail" "field tape" "field pad9" "foot foot";
+      gap: 1px; background: var(--line);
+    }
+    & :is(.d-status, .d-truths, .d-rail, .d-tape, .d-pad9) { background: var(--ground); border: 0; }
+
+    /* Title block: wordmark, console name, the two switches, the fixed records clock */
+    & .d-status {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "word crumb clock" "mode view rc";
+      align-items: center; gap: 0.45rem 1.25rem; padding: 0.6rem 1.25rem 0.55rem;
+    }
+    & .d-word { grid-area: word; font-size: 1.375rem; letter-spacing: 0.22em; line-height: 1; }
+    & .d-crumb { grid-area: crumb; font-size: clamp(1rem, 0.35rem + 1.1vw, 1.3125rem); letter-spacing: 0.16em; line-height: 1.15; color: var(--head); text-wrap: balance; }
+    & .d-mode { grid-area: mode; justify-self: start; }
+    & .d-view { grid-area: view; justify-self: start; }
+    & .d-clock { grid-area: clock; justify-self: end; margin: 0; }
+    & .d-rc { grid-area: rc; justify-self: end; text-align: right; }
+    & .d-switch { border-color: var(--line-ui); }
+    & .d-switch button { min-height: 2rem; padding: 0.25rem 0.7rem; font-size: 0.75rem; letter-spacing: 0.14em; color: var(--text-2); }
+    & .d-switch button:hover { color: var(--head); background: var(--overlay); }
+    & .d-switch button[aria-pressed="true"] { background: #333d48; color: #ffffff; box-shadow: inset 0 0 0 1px var(--text-2); }
+    & .d-mode button[data-set-mode="projected"][aria-pressed="true"] { background: transparent; color: var(--fog); box-shadow: none; }
+    & .d-switch button:focus-visible { position: relative; z-index: 2; }
+
+    /* Status line: the three counts as readouts, the sovereignty sentence on its red rule */
+    & .d-truths { grid-area: truths; padding: 0.5rem 1.25rem 0.6rem; gap: 0.35rem 1.5rem; border-top: 1px solid var(--ob-hair); }
+    & .tr-nums { gap: 0.25rem 1.5rem; }
+    & .tr-nums li { font-family: var(--display); font-weight: 500; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+    & .tr-nums b { font-size: 1.375rem; letter-spacing: 0; color: var(--head); }
+    & .tr-leave { font-size: 0.9375rem; line-height: 1.35; }
+
+    /* Nav tree, top right: the console rail as an instrument grid of keys */
+    & .d-rail { grid-area: rail; display: grid; align-content: center; padding: 0.65rem 0.85rem; overflow: visible; }
+    & .d-rail ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    & .d-rail li { display: flex; background: var(--ground); }
+    & .d-rail a { flex: 1; min-height: 2.125rem; padding: 0.2rem 0.6rem; gap: 0.5rem; border: 0; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.2; color: var(--text); }
+    & .d-rail .r-code { font-size: 0.75rem; color: var(--red-on-dark); letter-spacing: 0.04em; }
+    & .d-rail a:hover { background: var(--overlay); }
+    & .d-rail a[aria-current] { background: var(--overlay); border: 0; box-shadow: inset 0 0 0 2px var(--atni-red); }
+    & .d-rail a:focus-visible { position: relative; z-index: 2; outline-offset: 2px; }
+
+    /* Field: the only region that changes */
+    & .d-field { grid-area: field; background: var(--ob-dots), var(--ground); }
+    & .console { padding: 1.1rem 1.5rem 1.4rem; }
+    & .c-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.5rem 1rem; margin-bottom: 1rem; }
+    & .c-code { margin: 0; padding: 0.3rem 0.6rem 0.25rem; background: var(--ob-inv); font-size: 0.75rem; letter-spacing: 0.16em; color: var(--text); }
+    & .c-title { margin: 0; font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2.125rem); line-height: 1.08; text-wrap: balance; }
+    & .c-lede { grid-column: 1 / -1; font-size: 1rem; line-height: 1.45; color: var(--text-2); max-width: 70ch; }
+    & .c-ledger .c-lede { color: var(--ink-2); }
+    & .c-ledger .c-code .c-num { color: var(--red-on-dark); }
+    & .c-body > * + * { margin-top: 1rem; }
+    & .t-item { font-size: 0.9375rem; line-height: 1.5; }
+    /* Objectives matrix: application keys in sentence case so all nine columns fit the field */
+    & .ob-table th, & .ob-table td { padding: 0.5rem 0.4rem; }
+    & .ob-h { min-width: 12rem; padding-left: 0.65rem; }
+    & .ob-table thead .ob-app { font-size: 0.8125rem; letter-spacing: 0; text-transform: none; line-height: 1.25; }
+    & .ob-app a { color: var(--head); }
+    & .ob-app a:hover { text-decoration: underline; }
+    & .c-notshown { margin-top: 1.25rem; }
+    & .c-standby .c-frame { padding-top: 0.5rem; }
+    & .c-standby .c-head { display: block; }
+    & .c-standby .c-code { display: inline-block; margin-bottom: 0.6rem; }
+
+    /* Board: nine bays by evidence slots, a sticky slot header, the projected band below */
+    & .bd-scroll { overflow: visible; }
+    & .bd-table { table-layout: fixed; font-size: 0.875rem; }
+    & .bd-table thead th { position: sticky; top: 0; z-index: 1; }
+    & .bd-table thead th:nth-child(1) { width: 25%; }
+    & .bd-table thead th:nth-child(2) { width: 15%; }
+    & .bd-table thead th:nth-child(3) { width: 14%; }
+    & .bd-table thead th:nth-child(4) { width: 20%; }
+    & .bd-table th, & .bd-table td { padding: 0.5rem 0.65rem; }
+    & .bd-app a { font-size: 0.9375rem; line-height: 1.25; }
+    & .bd-tile { font-size: 0.8125rem; }
+    & .bd-stage { white-space: normal; }
+    & .bd-proj { padding: 0.85rem 1rem; }
+    & .bd-proj .d-h3 { font-size: 1.125rem; margin-bottom: 0.6rem; }
+    & .bd-svcs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* System: the living stage takes the field's full width so its labels stay legible; the five steps
+       sit under it as a row of keys, the step text below them. */
+    & .sy-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+    & .sys-wide { max-height: none; }
+    & .sy-stepper { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin-bottom: 0.9rem; background: var(--line); border: 1px solid var(--line); }
+    & .sy-stepper li { display: flex; background: var(--ground); }
+    & .sy-st { flex: 1; min-height: 2.75rem; padding: 0.35rem 0.6rem; border-left: 0; background: var(--ob-panel); font-size: 0.875rem; line-height: 1.2; }
+    & .sy-st:hover { background: var(--overlay); }
+    & .sy-st[aria-current] { background: var(--overlay); box-shadow: inset 0 0 0 2px var(--atni-red); }
+    & .sy-st:focus-visible { position: relative; z-index: 2; outline-offset: 2px; }
+    & .sy-tx { max-width: 70ch; }
+    & .sy-tx .d-h3 { font-size: 1.25rem; }
+    & .sy-tx p { font-size: 0.9375rem; }
+    & .sv-princ { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    & .sv-princ li { border-top: 0; background: var(--ob-panel); }
+
+    /* Applications: the bay fills the field; its six pads sit bottom right as a 3x2 housing, pad 6 NEXT */
+    & .c-apps { display: flex; flex-direction: column; }
+    & .c-apps > .c-frame, & .c-apps .c-body { flex: 1 0 auto; display: flex; flex-direction: column; }
+    & .c-apps .c-body > * + * { margin-top: 0; }
+    & .bay:not([hidden]) { flex: 1 0 auto; display: flex; flex-direction: column; padding: 1.1rem 0 0.5rem; }
+    & .c-apps .c-head { display: none; }
+    & .bay-frame {
+      flex: 1 0 auto; display: grid; padding: 0 0 3.25rem;
+      grid-template-columns: minmax(0, 1fr) clamp(18rem, 44%, 26rem);
+      grid-template-rows: auto auto minmax(0, 1fr);
+      grid-template-areas: "head pads" "cav pads" "panels pads";
+      gap: 0.9rem 1.25rem; align-items: start;
+    }
+    & .bay-head { grid-area: head; }
+    & .bay-kick { font-size: 0.75rem; letter-spacing: 0.14em; }
+    & .bay-h { font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2.125rem); margin-bottom: 0.35rem; text-wrap: balance; }
+    & .bay-one { font-size: 1rem; line-height: 1.4; margin-bottom: 0.5rem; max-width: 64ch; }
+    & .bay-meta { margin: 0; }
+    & .bay-cav { grid-area: cav; margin: 0; }
+    & .panels { grid-area: panels; }
+    & .pads {
+      grid-area: pads; align-self: end; position: sticky; bottom: 0; z-index: 2; margin: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    & .pad { min-height: 5.25rem; padding: 0.45rem 0.5rem 0.55rem; gap: 0.2rem 0.4rem; grid-template-columns: auto minmax(0, 1fr); }
+    & .pad-k { grid-row: auto; line-height: 1.3; }
+    & .pad-l { line-height: 1.3; }
+    & .pad-s { grid-column: 1 / -1; font-size: 0.75rem; line-height: 1.3; hyphens: auto; }
+    & .bay-cav { max-width: none; }
+    & .bay .badge { right: 0; bottom: 0.25rem; }
+    /* the active panel is the instrument in use: grey corner brackets on its hairline well */
+    & .panel {
+      padding: 1rem 1.15rem; font-size: 0.9375rem; line-height: 1.55;
+      background:
+        linear-gradient(var(--text-2), var(--text-2)) 0 0 / 0.75rem 1px no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 0 0 / 1px 0.75rem no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 100% 0 / 0.75rem 1px no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 100% 0 / 1px 0.75rem no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 0 100% / 0.75rem 1px no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 0 100% / 1px 0.75rem no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 100% 100% / 0.75rem 1px no-repeat,
+        linear-gradient(var(--text-2), var(--text-2)) 100% 100% / 1px 0.75rem no-repeat,
+        rgb(1 11 19 / 0.88);
+    }
+
+    /* Evidence tape: the ledger column, bare rows with dashed leaders, newest first */
+    & .d-tape { grid-area: tape; padding: 0.75rem 0.85rem 0.5rem; }
+    & .d-label { display: inline-block; margin: 0 0 0.4rem; padding: 0.25rem 0.55rem 0.2rem; background: var(--ob-inv); font-size: 0.75rem; letter-spacing: 0.16em; color: var(--text); }
+    & .d-note { margin-bottom: 0.5rem; color: var(--text-2); }
+    & .tp-list { gap: 0; }
+    & .tp-list li { border-top: 1px solid var(--ob-hair); }
+    & .tp-list a { padding: 0.4rem 0.3rem; border-left: 0; gap: 0.1rem 0.5rem; }
+    & .tp-list a:hover { background: var(--overlay); }
+    & .tp-list a:focus-visible { outline-offset: -2px; }
+    & .tp-app { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+    & .tp-app::after { content: ""; flex: 1 1 0.75rem; min-width: 0.75rem; border-bottom: 1px dashed var(--ob-leader); }
+    & .tp-list time { color: var(--text-2); }
+    & .tp-t { color: var(--text-2); }
+
+    /* Pad housing: the nine application keys, a 3x3 numpad under the tape */
+    & .d-pad9 { grid-area: pad9; padding: 0.6rem 0.85rem 0.75rem; }
+    & .d-pad9 ol { gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    & .d-pad9 li { display: flex; background: var(--ground); }
+    & .d-pad9 a { flex: 1; min-height: 3.75rem; padding: 0.35rem 0.45rem 0.4rem; gap: 0.15rem; border: 0; background: var(--ob-panel); align-content: start; }
+    & .d-pad9 .p9-k { font-size: 0.75rem; color: var(--red-on-dark); }
+    & .d-pad9 .p9-n { font-size: 0.8125rem; line-height: 1.15; overflow-wrap: normal; }
+    & .d-pad9 time { font-family: var(--display); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.02em; color: var(--text-2); }
+    & .d-pad9 .mk { top: 0.45rem; right: 0.45rem; }
+    & .d-pad9 a:hover { background: var(--overlay); }
+    & .d-pad9 a[aria-current] { background: var(--overlay); border: 0; box-shadow: inset 0 0 0 2px var(--atni-red); }
+    & .d-pad9 a:focus-visible { position: relative; z-index: 2; outline-offset: 2px; }
+
+    /* Command line: Ask the record given the bottom line, a prompt chevron drawn (not typed) in the input */
+    & .d-foot { grid-area: foot; flex-wrap: nowrap; gap: 0.75rem; padding: 0.5rem 1.25rem; background: var(--ob-panel); border: 0; }
+    & .d-foot .btn { min-height: 2.5rem; padding-inline: 0.85rem; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    & .d-ask { flex: 1 1 30rem; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "l l" "q go"; gap: 0.2rem 0; }
+    & .d-ask label { grid-area: l; font-size: 0.75rem; letter-spacing: 0.16em; line-height: 1.2; color: var(--text-2); }
+    & .d-ask input {
+      grid-area: q; width: 100%; min-height: 2.5rem; padding: 0.35rem 0.75rem 0.35rem 2.1rem;
+      border: 1px solid var(--line-ui); border-right: 0; background: var(--ob-well) no-repeat 0.8rem 50% / 0.6rem 0.9rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 12'%3E%3Cpath d='M1.5 1.5 6 6l-4.5 4.5' fill='none' stroke='%23f26b5e' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E");
+      font: 500 0.9375rem/1.2 var(--body); color: var(--text);
+    }
+    & .d-ask input::placeholder { font-size: 0.875rem; color: var(--text-3); }
+    & .d-ask input:focus-visible { outline-offset: 0; }
+    & .d-ask .btn { grid-area: go; min-height: 2.5rem; border-color: var(--line-ui); }
+    & .d-hint, & .d-credit { flex: 0 1 auto; font-size: 0.75rem; line-height: 1.35; color: var(--text-2); }
+    & .d-hint { max-width: 13rem; }
+    & .d-credit { max-width: 9rem; margin-left: 0; }
+    & .d-ask-out { left: 1.25rem; transform: none; width: min(46rem, calc(100% - 2.5rem)); padding: 0.7rem 0.95rem; background: var(--ob-panel); border: 1px solid var(--line-ui); font-size: 0.9375rem; }
+  }
+}
+
+/* Forced colours drop box-shadow: the place you are keeps a real outline there. */
+@media (forced-colors: active) {
+  html[data-skin="ops-board"] :is(.pad, .d-rail a, .d-pad9 a, .sy-st)[aria-current] { outline: 2px solid CanvasText; outline-offset: -3px; }
+}
+
+/* Narrower stages: the tier figure takes its own row so its labels keep their size */
+@media (min-width: 64em) and (max-width: 79.99em) and (min-height: 36em) {
+  html.js[data-skin="ops-board"][data-view="stage"] .sv-grid { grid-template-columns: minmax(0, 1fr); }
+  html.js[data-skin="ops-board"][data-view="stage"] {
+    & .bd-table th, & .bd-table td { padding: 0.45rem 0.5rem; }
+    & .bd-table thead th:nth-child(1) { width: 23%; }
+    & .bd-table thead th:nth-child(2) { width: 17%; }
+    & .bd-table thead th:nth-child(3) { width: 15%; }
+    & .pad { grid-template-columns: minmax(0, 1fr); }
+    & .pad-l { letter-spacing: 0.08em; }
+  }
+  html.js[data-skin="ops-board"][data-view="stage"] .d-hint { max-width: 9.5rem; }
+  html.js[data-skin="ops-board"][data-view="stage"] .d-credit { max-width: 6.5rem; }
+  html.js[data-skin="ops-board"][data-view="stage"] .d-foot { gap: 0.6rem; padding-inline: 1rem; }
+  html.js[data-skin="ops-board"][data-view="stage"] .d-ask input::placeholder { font-size: 0.8125rem; }
+}
+
+/* Wide desktops: room for the title block on one row and a longer command line */
+@media (min-width: 90em) and (min-height: 36em) {
+  html.js[data-skin="ops-board"][data-view="stage"] .d-hint { max-width: 22rem; }
+  html.js[data-skin="ops-board"][data-view="stage"] .d-credit { max-width: none; }
+}
