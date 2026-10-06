@@ -31,7 +31,13 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
 .hint { position: absolute; right: 0.5rem; bottom: 0.5rem; max-width: 18rem; background: var(--panel); border: 1px solid var(--line); padding: 0.4rem 0.6rem; color: var(--muted); font-size: 0.6875rem; }
 .status { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--panel); border: 1px solid var(--line); padding: 0.6rem 0.9rem; max-width: 80%; text-align: center; }
 .status:empty { display: none; }
-.bare .bar, .bare .legend, .bare .hint, .bare .status { display: none; }
+.cam button { font-size: 0.9375rem; padding-inline: 0.5rem; min-width: 2.5rem; }
+.orbit { position: absolute; right: 0.25rem; bottom: 0.25rem; border: 1px solid var(--line); }
+.orbit[hidden] { display: none; }
+/* Phones: a simple orbiting view; touches pass through to the page so it never traps scrolling. */
+.phone .bar, .phone .hint { display: none; }
+.phone #globe { pointer-events: none; }
+.bare .bar, .bare .legend, .bare .hint, .bare .status, .bare .orbit { display: none; }
 @media (max-width: 30em) {
   .hint { display: none; }
   .bar { left: 0.25rem; right: 0.25rem; top: 0.25rem; gap: 0.25rem; }
@@ -45,20 +51,27 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
 <img class="still" src="still.jpg" alt="Three-dimensional terrain under aerial imagery with a gold-to-red wind resource layer showing modeled wind speed across ridges and valleys">
 <div id="globe" aria-hidden="true"></div>
 <div class="bar">
-  <div class="grp" role="group" aria-label="Camera">
-    <button type="button" data-view="overview">Overview</button>
-    <button type="button" data-view="west">West</button>
-    <button type="button" data-view="center">Center</button>
-    <button type="button" data-view="east">East</button>
-    <button type="button" data-view="top">Top</button>
-  </div>
   <div class="grp">
-    <button type="button" id="wind" aria-pressed="true">Wind layer</button>
-    <button type="button" id="relief" aria-pressed="false">2x relief</button>
+    <button type="button" id="mode3d" aria-pressed="false">3D view</button>
+    <button type="button" id="reset">Reset</button>
+  </div>
+  <div class="grp cam" role="group" aria-label="Camera">
+    <button type="button" data-cam="left" aria-label="Rotate left" title="Rotate left"><span aria-hidden="true">&#8634;</span></button>
+    <button type="button" data-cam="right" aria-label="Rotate right" title="Rotate right"><span aria-hidden="true">&#8635;</span></button>
+    <button type="button" data-cam="up" aria-label="Tilt up" title="Tilt up"><span aria-hidden="true">&#9650;</span></button>
+    <button type="button" data-cam="down" aria-label="Tilt down" title="Tilt down"><span aria-hidden="true">&#9660;</span></button>
+    <button type="button" data-cam="in" aria-label="Zoom in" title="Zoom in"><span aria-hidden="true">+</span></button>
+    <button type="button" data-cam="out" aria-label="Zoom out" title="Zoom out"><span aria-hidden="true">&#8722;</span></button>
+  </div>
+  <div class="grp" role="group" aria-label="Layers">
+    <button type="button" data-layer="imagery" aria-pressed="true">Imagery</button>
+    <button type="button" data-layer="wind" aria-pressed="true">Wind</button>
+    <button type="button" data-layer="terrain" aria-pressed="true">Terrain</button>
   </div>
 </div>
+<button type="button" id="orbit" class="orbit" aria-pressed="false" hidden>Pause</button>
 <div class="legend" id="legend"><p>Wind Speed</p><div class="ramp"></div><div class="ends"><span>4 m/s</span><span>15 m/s</span></div></div>
-<p class="hint">Drag to orbit, scroll or pinch to zoom; keyboard: use the view buttons.</p>
+<p class="hint">Drag to move, scroll or pinch to zoom; the camera buttons do the same from the keyboard.</p>
 <p class="status" id="status" role="status">Loading 3D view...</p>
 <script>window.CESIUM_BASE_URL = "cesium/";</script>
 <script src="cesium/Cesium.js"></script>
@@ -121,36 +134,102 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
   }));
   wind.alpha = 0.5;
 
-  var VIEWS = {
-    overview: [-121.95, 45.05, 30000, 28, -24],
-    west: [-122.30, 45.50, 9000, 70, -16],
-    center: [-121.62, 45.52, 9000, 15, -20],
-    east: [-120.95, 45.50, 11000, -20, -20],
-    top: [-121.49, 45.75, 95000, 0, -90]
+  var camera = viewer.camera, D = C.Math.toRadians;
+  var HOME = C.Cartesian3.fromDegrees(-121.49, 45.75, 0);
+  var TOP = C.Rectangle.fromDegrees(-122.56, 45.40, -120.42, 46.10);
+  var PITCH_3D = D(-32), PITCH_MIN = D(-89.9), PITCH_MAX = D(-8);
+  var RANGE_MIN = 2500, RANGE_MAX = 150000;
+  var mode3d = document.getElementById("mode3d");
+
+  // The point under the middle of the view: what rotate, tilt and zoom turn around.
+  function target() {
+    var mid = new C.Cartesian2(scene.canvas.clientWidth / 2, scene.canvas.clientHeight / 2);
+    var ray = camera.getPickRay(mid);
+    return (ray && globe.pick(ray, scene)) || camera.pickEllipsoid(mid) || HOME;
+  }
+  function pose() {
+    var t = target();
+    return { t: t, h: camera.heading, p: camera.pitch, r: C.Cartesian3.distance(camera.position, t) };
+  }
+  var anim = 0;
+  function place(t, h, p, r, instant) {
+    p = Math.min(PITCH_MAX, Math.max(PITCH_MIN, p)); r = Math.min(RANGE_MAX, Math.max(RANGE_MIN, r));
+    var from = pose(), id = ++anim, t0 = performance.now(), dur = instant || reduce ? 0 : 450;
+    var dh = ((h - from.h + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
+    (function step(now) {
+      if (id !== anim) return;
+      var k = dur ? Math.min(1, (now - t0) / dur) : 1, e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      camera.lookAt(t, new C.HeadingPitchRange(from.h + dh * e, from.p + (p - from.p) * e, from.r + (r - from.r) * e));
+      camera.lookAtTransform(C.Matrix4.IDENTITY);
+      scene.requestRender();
+      if (k < 1) requestAnimationFrame(step); else sync();
+    })(t0);
+  }
+  function sync() { mode3d.setAttribute("aria-pressed", String(camera.pitch > D(-80))); }
+  function topView(instant) {
+    anim++;
+    var o = { destination: TOP, orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 } };
+    if (instant || reduce) { camera.setView(o); sync(); scene.requestRender(); }
+    else camera.flyTo(Object.assign(o, { duration: 1.2, complete: sync }));
+  }
+  function view3d(instant) { var s = pose(); place(s.t, s.h, PITCH_3D, s.r * 0.75, instant); }
+
+  mode3d.addEventListener("click", function () { if (mode3d.getAttribute("aria-pressed") === "true") topView(); else view3d(); });
+  document.getElementById("reset").addEventListener("click", function () { topView(); });
+  var STEP = { left: [D(-20), 0, 1], right: [D(20), 0, 1], up: [0, D(10), 1], down: [0, D(-10), 1], in: [0, 0, 0.65], out: [0, 0, 1.5] };
+  document.querySelectorAll("[data-cam]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var s = pose(), d = STEP[b.dataset.cam];
+      // Rotating from straight down first tilts into 3D, or the turn would only spin the map.
+      var p = s.p + d[1];
+      if (d[0] && s.p < D(-80)) p = PITCH_3D;
+      place(s.t, s.h + d[0], p, s.r * d[2]);
+    });
+  });
+  camera.moveEnd.addEventListener(sync);
+
+  var legend = document.getElementById("legend");
+  var LAYER = {
+    imagery: function (on) { viewer.imageryLayers.get(0).show = on; },
+    wind: function (on) { wind.show = on; legend.hidden = !on; },
+    terrain: function (on) { scene.verticalExaggeration = on ? 1 : 0; }
   };
-  function go(name, instant) {
-    var v = VIEWS[name];
-    var o = { destination: C.Cartesian3.fromDegrees(v[0], v[1], v[2]),
-              orientation: { heading: C.Math.toRadians(v[3]), pitch: C.Math.toRadians(v[4]), roll: 0 } };
-    if (instant || reduce) viewer.camera.setView(o); else viewer.camera.flyTo(Object.assign(o, { duration: 2 }));
-    document.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.view === name)); });
+  document.querySelectorAll("[data-layer]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", String(on)); LAYER[b.dataset.layer](on); scene.requestRender();
+    });
+  });
+
+  // Phones: a simple, slowly orbiting 3D view with one pause control (held still under reduced motion).
+  var orbitBtn = document.getElementById("orbit"), orbiting = false, orbitH = D(-20), orbitId = 0;
+  var PAUSE = "Pause", PLAY = "Play";
+  function orbitFrame() {
+    camera.lookAt(HOME, new C.HeadingPitchRange(orbitH, D(-30), 90000));
     scene.requestRender();
   }
-  document.querySelectorAll("[data-view]").forEach(function (b) { b.addEventListener("click", function () { go(b.dataset.view); }); });
-  var windBtn = document.getElementById("wind"), legend = document.getElementById("legend");
-  windBtn.addEventListener("click", function () {
-    var on = windBtn.getAttribute("aria-pressed") !== "true";
-    windBtn.setAttribute("aria-pressed", String(on)); wind.show = on; legend.hidden = !on; scene.requestRender();
-  });
-  var reliefBtn = document.getElementById("relief");
-  reliefBtn.addEventListener("click", function () {
-    var on = reliefBtn.getAttribute("aria-pressed") !== "true";
-    reliefBtn.setAttribute("aria-pressed", String(on)); scene.verticalExaggeration = on ? 2 : 1; scene.requestRender();
-  });
+  function orbit(on) {
+    orbiting = on; orbitBtn.textContent = on ? PAUSE : PLAY;
+    var id = ++orbitId, last = performance.now();
+    if (on) requestAnimationFrame(function tick(now) {
+      if (!orbiting || id !== orbitId) return;
+      orbitH += (now - last) * 0.00012; last = now; orbitFrame();
+      requestAnimationFrame(tick);
+    });
+  }
+  orbitBtn.addEventListener("click", function () { orbit(!orbiting); });
+  document.addEventListener("visibilitychange", function () { if (document.hidden && orbiting) orbit(false); });
+
   var qs = new URLSearchParams(location.search);
   if (qs.has("bare")) document.body.classList.add("bare");
-  // Opens on the still's own view, so the still hands over to the live scene without a jump.
-  go(VIEWS[qs.get("view")] ? qs.get("view") : "center", true);
+  var phone = qs.has("phone") || matchMedia("(max-width: 30em)").matches;
+  if (phone) {
+    document.body.classList.add("phone");
+    scene.screenSpaceCameraController.enableInputs = false;
+    orbitFrame();
+    if (!reduce) { orbitBtn.hidden = false; orbit(true); }
+  } else if (qs.get("view") === "3d") { topView(true); view3d(true); }
+  else topView(true);
 
   // Reveal once the first view's tiles have loaded.
   var shown = false;
