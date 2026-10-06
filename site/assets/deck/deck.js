@@ -272,7 +272,10 @@
     }
     if (in9) {
       const items = $$('.d-pad9 a'), i = items.indexOf(in9);
-      const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 3, ArrowUp: -3 }[k];
+      const firstTop = items[0].getBoundingClientRect().top;
+      const columns = items.filter(a => Math.abs(a.getBoundingClientRect().top - firstTop) < 1).length;
+      const verticalStep = columns === items.length ? 1 : Math.max(1, columns);
+      const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: verticalStep, ArrowUp: -verticalStep }[k];
       if (d) { rove(items, i + d, e); return true; }
       if (k === 'Home' || k === 'End') { rove(items, k === 'Home' ? 0 : items.length - 1, e); return true; }
       if (/^[1-9]$/.test(k)) { e.preventDefault(); const a = items[+k - 1]; a.focus(); go({ console: 'apps', app: a.dataset.app }, { from: a }); return true; }
@@ -282,12 +285,12 @@
       const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[k];
       if (d) { rove(items, i + d, e); return true; }
       if (k === 'Home' || k === 'End') { rove(items, k === 'Home' ? 0 : items.length - 1, e); return true; }
-      if (/^[1-6]$/.test(k)) { e.preventDefault(); const a = items[+k - 1]; a.focus(); go({ pad: a.dataset.pad }, { pad: true, console: false, focus: false }); return true; }
+      if (/^[1-6]$/.test(k)) { e.preventDefault(); const a = items[+k - 1]; a.focus(); go({ console: 'apps', app: inPad.closest('.bay').dataset.app, pad: a.dataset.pad }, { pad: true, console: false, focus: false }); return true; }
     }
     const lr = { ArrowRight: 1, ArrowLeft: -1 }[k];
-    if (lr && t.closest('.sy-stepper, .sy-ctrl')) { e.preventDefault(); go({ step: clamp(st.step + lr, 1, 5) }, { console: false }); return true; }
-    if (lr && t.closest('.tl-ctrl, .tl-list')) { e.preventDefault(); go({ tl: clamp(st.tl + lr, 0, D.records.length - 1) }, { console: false }); return true; }
-    if (lr && t.closest('.sv-ctrl')) { e.preventDefault(); go({ tier: clamp(st.tier + lr, 0, 3) }, { console: false }); return true; }
+    if (lr && t.closest('.sy-stepper, .sy-ctrl')) { e.preventDefault(); go({ console: 'system', step: clamp(st.step + lr, 1, 5) }, { console: false }); return true; }
+    if (lr && t.closest('.tl-ctrl, .tl-list')) { e.preventDefault(); go({ console: 'timeline', tl: clamp(st.tl + lr, 0, D.records.length - 1) }, { console: false }); return true; }
+    if (lr && t.closest('.sv-ctrl')) { e.preventDefault(); go({ console: 'sovereignty', tier: clamp(st.tier + lr, 0, 3) }, { console: false }); return true; }
     return false;
   }
   const editable = (t) => t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName);
@@ -316,9 +319,9 @@
     const act = t.dataset.act;
     if (act === 'keys') return openKeys();
     if (act === 'shortcuts') return setShortcuts(!shortcuts);
-    const nav = { 'sys-prev': { step: st.step - 1 }, 'sys-next': { step: st.step + 1 }, 'tl-prev': { tl: st.tl - 1 }, 'tl-next': { tl: st.tl + 1 }, 'sv-prev': { tier: st.tier - 1 }, 'sv-next': { tier: st.tier + 1 } }[act];
+    const nav = { 'sys-prev': { console: 'system', step: st.step - 1 }, 'sys-next': { console: 'system', step: st.step + 1 }, 'tl-prev': { console: 'timeline', tl: st.tl - 1 }, 'tl-next': { console: 'timeline', tl: st.tl + 1 }, 'sv-prev': { console: 'sovereignty', tier: st.tier - 1 }, 'sv-next': { console: 'sovereignty', tier: st.tier + 1 } }[act];
     if (nav) {
-      const n = { step: clamp(nav.step ?? st.step, 1, 5), tl: clamp(nav.tl ?? st.tl, 0, D.records.length - 1), tier: clamp(nav.tier ?? st.tier, 0, 3) };
+      const n = { console: nav.console, step: clamp(nav.step ?? st.step, 1, 5), tl: clamp(nav.tl ?? st.tl, 0, D.records.length - 1), tier: clamp(nav.tier ?? st.tier, 0, 3) };
       return go(n, { console: false });
     }
     if (t.dataset.filter) return filter(t);
@@ -385,6 +388,9 @@
   addEventListener('beforeprint', () => { H.dataset.print = '1'; apply({}, { announce: false, instant: true }); });
   addEventListener('afterprint', () => { delete H.dataset.print; apply({}, { announce: false, instant: true }); });
   mqStage.addEventListener('change', () => apply({}, { announce: false, instant: true }));
+  mqReduce.addEventListener('change', () => {
+    if (reduce() && stageOn() && st.console === 'system') camera(st.step, true);
+  });
 
   // ---------------------------------------------------------------- embedded displays (D47g)
   // A heavy embedded view (GeoBase's 3D display) loads only once its figure is shown and near

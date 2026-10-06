@@ -613,6 +613,13 @@ html.js[data-station] .d-pad9, html.js[data-station] .d-foot, html.js[data-stati
   html.js[data-station][data-view="stage"] .deck { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "status" "field"; }
 }
 
+/* Keep enlarged dock labels inside their targets without reducing text size. */
+@media (max-width: 17.5em) {
+  html.js .d-dock ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.js body { padding-bottom: 5.75rem; }
+  html.js { scroll-padding-bottom: 6.25rem; }
+}
+
 /* ------------------------------------------------------------------ print: the dossier on paper */
 @media print {
   @page { margin: 0.6in; }
@@ -626,6 +633,13 @@ html.js[data-station] .d-pad9, html.js[data-station] .d-foot, html.js[data-stati
   .d-rail, .d-tape, .d-pad9, .d-foot, .d-dock, .d-switch, .d-ctrl, .sy-stepper, .lg-filter, .trace, .rcpt, .skip, .d-keys, .receipt, .decor, .pads, .badge, .sys-keybox summary::after { display: none !important; }
   .d-status { position: static !important; border: 0; padding: 0 0 0.25in; background: none !important; }
   .d-word a, .d-crumb, .d-clock, .d-rc, .d-rc b, .tr-nums b, .tr-leave { color: #000000 !important; }
+  /* The reading skin's dark surround must not carry into the paper chrome. */
+  .d-status, .d-truths {
+    --head: #000000; --text: #000000; --text-2: #222222; --text-3: #333333;
+    --gold: #6b4f17; --amber: #8a5a1e; --fog: #4f5356; --fog-2: #6a6862;
+    --red-on-dark: #b02821;
+    background: transparent !important; color: #000000 !important;
+  }
   .d-truths { padding: 0 0 0.2in; }
   .console { padding: 0.25in 0 !important; border: 0; break-before: page; background: none !important; color: #000000; }
   .c-standby { break-before: auto; }

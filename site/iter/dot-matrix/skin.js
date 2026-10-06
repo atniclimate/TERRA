@@ -151,7 +151,7 @@ function draw(k) {
 }
 
 // The loop runs only while something moves: a migration, a camera follow or a decaying wake.
-const wakeOn = () => motion && live && vis && !document.hidden;
+const wakeOn = () => motion && !mqR.matches && live && vis && !document.hidden;
 function kick() { if (!raf && live && vis && !document.hidden) raf = requestAnimationFrame(frame); }
 function stop() { cancelAnimationFrame(raf); raf = 0; last = 0; }
 function settle() { if (mig >= 0) { mig = -1; x.set(tx); y.set(ty); } }
@@ -170,7 +170,8 @@ function frame(now) {
     if (t >= 1) { mig = -1; k = 1; } else busy = true;
   }
   if (waking) {
-    const fresh = ptr && wakeOn() && now - lastIn < 120;
+    // Frame entry already checked visibility; the preference listener owns motion.
+    const fresh = ptr && motion && now - lastIn < 120;
     let act = false;
     spd *= M.exp(-3 * dt);
     for (let i = 0; i < N; i++) if (a[i] > 0) { a[i] = M.max(0, a[i] - dt / 3.2); act = act || a[i] > 0; }
@@ -205,14 +206,15 @@ H.addEventListener('pointerleave', () => { ptr = null; }, { passive: true });
 
 // The Motion toggle, in the footer after Shortcuts; words from the deck's copy.
 const sc = $('.d-foot [data-act="shortcuts"]');
+let syncMotion = () => {};
 if (sc) {
   const b = document.createElement('button'), n = document.createElement('span'), l = document.createElement('span'), st = document.createElement('b');
   b.type = 'button'; b.className = 'btn btn-quiet d-sc dm-mo'; b.setAttribute('aria-describedby', 'dm-mo-n');
   l.textContent = T['deck.motion.label']; b.append(l, ' ', st);
   n.id = 'dm-mo-n'; n.className = 'sr-only'; n.textContent = T['deck.motion.note'];
-  const sync = () => { b.setAttribute('aria-pressed', String(motion)); st.textContent = T[motion ? 'deck.motion.on' : 'deck.motion.off']; };
-  b.addEventListener('click', () => { motion = !motion; store(motion ? 'on' : 'off'); sync(); if (!motion && live) { calm(); settle(); draw(1); } });
-  sync(); sc.after(b, n);
+  syncMotion = () => { b.disabled = mqR.matches; b.setAttribute('aria-pressed', String(motion)); st.textContent = T[motion ? 'deck.motion.on' : 'deck.motion.off']; };
+  b.addEventListener('click', () => { if (mqR.matches) return; motion = !motion; store(motion ? 'on' : 'off'); syncMotion(); if (!motion && live) { calm(); settle(); draw(1); } });
+  syncMotion(); sc.after(b, n);
 }
 
 // Sizing (re-reads devicePixelRatio), events, start.
@@ -229,7 +231,10 @@ const dprWatch = () => matchMedia(`(resolution: ${devicePixelRatio || 1}dppx)`).
 addEventListener('resize', onResize, { passive: true });
 field.addEventListener('scroll', onScroll, { passive: true });
 mqS.addEventListener('change', onResize);
-mqR.addEventListener('change', () => { settle(); layout(false); });
+mqR.addEventListener('change', () => {
+  motion = !mqR.matches && store() !== 'off';
+  stop(); calm(); follow = 0; settle(); syncMotion(); layout(false);
+});
 let prev = {};
 document.addEventListener('deck:change', (e) => {
   const d = e.detail, cam = d.console === 'system' && prev.console === 'system' && d.step !== prev.step;

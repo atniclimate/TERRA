@@ -141,6 +141,7 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
   globe.backFaceCulling = false; // the source mesh tiles are wound clockwise
   globe.cartographicLimitRectangle = BOUNDS; // draw only where every layer has data
   globe.maximumScreenSpaceError = 1.5;
+  globe.preloadAncestors = false;
   var ctl = scene.screenSpaceCameraController;
   ctl.minimumZoomDistance = 600; ctl.maximumZoomDistance = 160000;
 
