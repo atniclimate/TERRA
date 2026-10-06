@@ -169,16 +169,18 @@
   }
   function camera(step, instant) {
     if (!wide || !wide.getClientRects().length) { if (wide) { cam = full.slice(); wide.setAttribute('viewBox', full.join(' ')); } return; }
-    const to = { 1: () => box('.sys-L1'), 2: () => box('.sys-L1, .sys-L2'), 3: () => box('.sys-L3'), 4: () => box('.sys-L4'), 5: () => full }[step]();
+    // Frame the tiles and domain labels (L1 also carries the date key in the far corner).
+    const to = { 1: () => box('.sys-L1 .sys-app, .sys-L1 .dom'), 2: () => box('.sys-L1 .sys-app, .sys-L1 .dom, .sys-L2'), 3: () => box('.sys-L3'), 4: () => box('.sys-L4'), 5: () => full }[step]();
     cancelAnimationFrame(camRaf);
-    if (instant) { cam = to.slice(); wide.setAttribute('viewBox', cam.join(' ')); return; }
+    const done = () => document.dispatchEvent(new CustomEvent('deck:camera', { detail: { step } }));
+    if (instant) { cam = to.slice(); wide.setAttribute('viewBox', cam.join(' ')); done(); return; }
     const from = cam.slice(), t0 = performance.now(), dur = 420;
     const ease = (t) => 1 - Math.pow(1 - t, 3.2);
     const tick = (now) => {
       const k = ease(Math.min(1, (now - t0) / dur));
       cam = from.map((v, i) => v + (to[i] - v) * k);
       wide.setAttribute('viewBox', cam.map((v) => v.toFixed(1)).join(' '));
-      if (k < 1) camRaf = requestAnimationFrame(tick);
+      if (k < 1) camRaf = requestAnimationFrame(tick); else done();
     };
     camRaf = requestAnimationFrame(tick);
   }

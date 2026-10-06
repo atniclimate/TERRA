@@ -163,6 +163,8 @@ kbd { display: inline-block; min-width: 1.6rem; padding: 0.1rem 0.4rem; border: 
 
 /* 00 standby */
 .c-standby .c-photo::after { background: linear-gradient(90deg, rgb(1 11 19 / 0.92) 0%, rgb(1 11 19 / 0.82) 55%, rgb(1 11 19 / 0.55) 100%); }
+/* On phones the text spans the full width, so the veil is uniform rather than fading to the right. */
+@media (max-width: 47.5em) { .c-standby .c-photo::after { background: rgb(1 11 19 / 0.86); } }
 .sb-id { margin: 0 0 1rem; }
 .sb-eyebrow { margin: 0 0 0.75rem; }
 .sb-word { margin: 0; font-size: clamp(3.75rem, 1.6rem + 9vw, 8rem); line-height: 0.86; letter-spacing: -0.02em; color: var(--head); }
@@ -467,7 +469,7 @@ html { scroll-padding-top: 4.5rem; }
 @media (max-width: 47.99em) {
   .fn { grid-template-columns: auto minmax(0, 1fr); }
   .fn .fn-s { grid-column: 2; }
-  .fn .fn-t { grid-column: 2; }
+  .fn .fn-t { grid-column: 1 / -1; }
   .t-item { grid-template-columns: auto minmax(0, 1fr); }
   .t-item time { grid-column: 1 / -1; }
   .lg-row { grid-template-columns: 2.5rem minmax(0, 1fr); }
@@ -523,12 +525,12 @@ html { scroll-padding-top: 4.5rem; }
   .tp-t { grid-column: 2 / -1; font-size: 0.75rem; line-height: 1.35; color: var(--text-2); }
   .d-pad9 ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.25rem; }
   .d-pad9 a { display: grid; grid-template-rows: auto auto auto; gap: 0.1rem; min-height: 3.6rem; padding: 0.3rem 0.35rem; border: 1px solid var(--line-ui); text-decoration: none; color: var(--text); background: var(--raised); }
-  .d-pad9 .p9-k { font: 600 0.6875rem/1 var(--display); color: var(--text-2); }
+  .d-pad9 .p9-k { font: 600 0.75rem/1 var(--display); color: var(--text-2); }
   .d-pad9 .mk { width: 0.625rem; height: 0.625rem; position: absolute; }
   .d-pad9 li { position: relative; }
   .d-pad9 .mk { top: 0.4rem; right: 0.4rem; }
   .d-pad9 .p9-n { font-family: var(--display); font-weight: 600; font-size: 0.75rem; line-height: 1.1; overflow-wrap: anywhere; }
-  .d-pad9 time { font-size: 0.6875rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .d-pad9 time { font-size: 0.75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .d-pad9 a[aria-current] { border-color: var(--atni-red); box-shadow: inset 0 -3px 0 var(--atni-red); }
   .d-pad9 a:hover { border-color: var(--text-2); }
   /* Consoles in the stage */
@@ -538,11 +540,20 @@ html { scroll-padding-top: 4.5rem; }
   html.js[data-view="stage"] .sys-grid, html.js[data-view="stage"] .sys-tall { display: none; }
   html.js[data-view="stage"] .sy-grid { grid-template-columns: minmax(0, 1fr) minmax(14rem, 17rem); }
   html.js[data-view="stage"] .c-apps .c-head { display: none; }
-  html.js[data-view="stage"] .c-apps { padding-top: 0; }
+  html.js[data-view="stage"] .console.c-apps { padding-top: 0; }
+  /* One panel shows at a time on the stage; hidden panels must not leave grid gaps. */
+  html.js[data-view="stage"] .panels { gap: 0; }
   html.js[data-view="stage"] .bay { border-top: 0; padding-top: clamp(1.25rem, 0.5rem + 1.5vw, 2.25rem); }
-  html.js[data-view="stage"] .pads { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  html.js[data-view="stage"] .pads { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.js[data-view="stage"] .c-apps .c-notshown { margin-top: 1.25rem; }
 }
+
+@media (min-width: 90em) and (min-height: 36em) {
+  html.js[data-view="stage"] .pads { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+/* ATNI logos stay on splash areas only (D21): the standby console, never over a bay's panels. */
+.bay .badge { display: none; }
+@media (max-width: 47.5em) { .c-standby .c-frame { padding-bottom: 3.5rem; } }
 
 /* ------------------------------------------------------------------ Today | Projected (moment 5)
    Projected is always drawn dotted over Today's ghost and never shown alone; dotted lines never move.
