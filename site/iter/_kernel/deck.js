@@ -31,6 +31,7 @@
   const hide = (el, on) => { if (on) el.setAttribute('hidden', 'until-found'); else el.removeAttribute('hidden'); };
 
   // ---------------------------------------------------------------- routes
+  const routeInt = (value, fallback, min, max) => clamp(Number.isFinite(+value) ? Math.trunc(+value) : fallback, min, max);
   function parse(hash) {
     let h;
     try { h = decodeURIComponent((hash || '').replace(/^#/, '')); }
@@ -44,13 +45,13 @@
         if (APPS.includes(p[1])) r.app = p[1];
         if (D.pads.includes(p[2])) r.pad = p[2];
       }
-      if (r.console === 'system' && p[1]) r.step = clamp(+p[1] || 5, 1, 5);
-      if (r.console === 'timeline' && p[1]) r.tl = clamp((+p[1] || 1) - 1, 0, D.records.length - 1);
-      if (r.console === 'sovereignty' && p[1]) r.tier = clamp(+p[1] || 0, 0, 3);
+      if (r.console === 'system' && p[1]) r.step = routeInt(p[1], 5, 1, 5);
+      if (r.console === 'timeline' && p[1]) r.tl = routeInt(p[1], 1, 1, D.records.length) - 1;
+      if (r.console === 'sovereignty' && p[1]) r.tier = routeInt(p[1], 0, 0, 3);
       return r;
     }
     if ((m = h.match(/^c-(\w+)$/)) && IDS.includes(m[1])) return { console: m[1] };
-    if ((m = h.match(/^bay-(\w+?)(?:-p-(\w+))?$/)) && APPS.includes(m[1])) return { console: 'apps', app: m[1], pad: m[2] };
+    if ((m = h.match(/^bay-(\w+?)(?:-p-(\w+))?$/)) && APPS.includes(m[1])) return { console: 'apps', app: m[1], pad: D.pads.includes(m[2]) ? m[2] : 'today' };
     return null;
   }
   function hashOf(s) {
