@@ -136,6 +136,8 @@ html[data-skin="field-station"] {
 
 /* Document view keeps each console's own photograph; a slightly deeper veil holds the sampled titles. */
 html[data-skin="field-station"] .console > .c-photo::after { background: rgb(1 11 19 / 0.82); }
+/* The opening eyebrow is the only small red text over a photograph: a lifted ATNI red keeps it at 7:1 over the veil. */
+html[data-skin="field-station"] .c-standby .sb-eyebrow { color: #f6938a; }
 html[data-skin="field-station"] .c-standby > .c-photo::after { background: linear-gradient(90deg, rgb(1 11 19 / 0.92) 0%, rgb(1 11 19 / 0.84) 60%, rgb(1 11 19 / 0.6) 100%); }
 html[data-skin="field-station"] .c-ledger :is(.c-num, .pn-k)::after { --fs-slash: rgb(21 25 29 / 0.55); }
 
