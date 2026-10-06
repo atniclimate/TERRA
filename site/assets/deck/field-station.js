@@ -38,6 +38,8 @@
     if (key === shown) return;
     shown = key;
     const my = ++ticket;
+    // This slot may still be owned by the preceding transition's cleanup.
+    clearTimeout(settle);
     const prev = vis, next = vis === layers[0] ? layers[1] : layers[0];
     const instant = first || mqReduce.matches;
     next.replaceChildren();

@@ -310,7 +310,7 @@
   // ---------------------------------------------------------------- clicks and forms
   document.addEventListener('click', (e) => {
     const t = e.target.closest('a, button');
-    if (!t || e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (!t || e.defaultPrevented || e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     if (t.dataset.setMode) { setMode(t.dataset.setMode); return; }
     if (t.dataset.setView) { setView(t.dataset.setView, true); return; }
     const act = t.dataset.act;
@@ -322,7 +322,7 @@
       return go(n, { console: false });
     }
     if (t.dataset.filter) return filter(t);
-    if (t.tagName !== 'A') return;
+    if (t.localName !== 'a') return;
     const href = t.getAttribute('href') || '';
     if (t.classList.contains('sy-st')) { e.preventDefault(); return go({ console: 'system', step: +t.dataset.step }, { console: st.console !== 'system' }); }
     if (href === '#d-rail') return;

@@ -16,6 +16,9 @@ html, body { margin: 0; height: 100%; background: var(--ground); color: var(--te
 .cesium-viewer-bottom, .cesium-widget-credits { display: none !important; }
 .still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.6s; }
 .ready .still { opacity: 0; pointer-events: none; }
+.failed .still { opacity: 1; transition: none; }
+.failed #globe, .failed .hint { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .still { transition: none; } }
 .bar { position: absolute; left: 0.5rem; right: 0.5rem; top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; pointer-events: none; }
 .bar > * { pointer-events: auto; }
 .grp { display: flex; flex-wrap: wrap; gap: 1px; background: var(--line); border: 1px solid var(--line); }
@@ -69,7 +72,7 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
     <button type="button" data-layer="terrain" aria-pressed="true">Terrain</button>
   </div>
 </div>
-<button type="button" id="orbit" class="orbit" aria-pressed="false" hidden>Pause</button>
+<button type="button" id="orbit" class="orbit" hidden>Pause</button>
 <div class="legend" id="legend"><p>Wind Speed</p><div class="ramp"></div><div class="ends"><span>4 m/s</span><span>15 m/s</span></div></div>
 <p class="hint">Drag to move, scroll or pinch to zoom; the camera buttons do the same from the keyboard.</p>
 <p class="status" id="status" role="status">Loading 3D view...</p>
@@ -79,9 +82,28 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
 (async function () {
   "use strict";
   var status = document.getElementById("status");
-  var FAIL = "This display requires WebGL. The still image stands in.";
-  if (!window.Cesium) { status.textContent = FAIL; return; }
-  var C = window.Cesium;  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var FAIL = "This display requires WebGL. The still image stands in.", LOAD_FAIL = "The 3D view could not load. The still image remains available.";
+  var failed = false, shown = false;
+  function controls(disabled) {
+    document.querySelectorAll("button").forEach(function (b) { b.disabled = disabled; });
+  }
+  function failLoad(message) {
+    if (failed) return;
+    failed = true;
+    document.body.classList.remove("ready"); document.body.classList.add("failed");
+    status.textContent = typeof message === "string" ? message : LOAD_FAIL;
+    controls(true);
+    if (orbitBtn) { orbit(false); orbitBtn.hidden = true; }
+    if (viewer) {
+      if (camera) stopCamera(); else viewer.camera.cancelFlight();
+      viewer.scene.screenSpaceCameraController.enableInputs = false;
+      viewer.useDefaultRenderLoop = false;
+    }
+  }
+  controls(true);
+  if (!window.Cesium) { failLoad(); return; }
+  var C = window.Cesium, motion = matchMedia("(prefers-reduced-motion: reduce)");
+  var reduce = motion.matches;
   var BOUNDS = C.Rectangle.fromDegrees(-122.50444547763546, 45.473645866057595, -120.47745472415154, 46.02625628738846);
 
   // Terrain tiles are stored gzipped (Pages cannot send Content-Encoding for .terrain): gunzip here.
@@ -103,10 +125,12 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
       baseLayer: false, baseLayerPicker: false, geocoder: false, homeButton: false, sceneModePicker: false,
       navigationHelpButton: false, animation: false, timeline: false, fullscreenButton: false, infoBox: false,
       selectionIndicator: false, vrButton: false, requestRenderMode: true, maximumRenderTimeChange: Infinity,
-      skyBox: false, contextOptions: { webgl: { preserveDrawingBuffer: true } }
+      skyBox: false, showRenderLoopErrors: false, contextOptions: { webgl: { preserveDrawingBuffer: true } }
     });
-  } catch (e) { status.textContent = FAIL; return; }
+  } catch (e) { failLoad(FAIL); return; }
   var scene = viewer.scene, globe = scene.globe;
+  scene.renderError.addEventListener(failLoad);
+  scene.canvas.addEventListener("webglcontextlost", function () { failLoad(FAIL); });
   scene.backgroundColor = C.Color.fromCssColorString("#010b13");
   globe.baseColor = C.Color.fromCssColorString("#0b1620");
   globe.showGroundAtmosphere = false;
@@ -121,17 +145,23 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
   ctl.minimumZoomDistance = 600; ctl.maximumZoomDistance = 160000;
 
   try {
-    viewer.terrainProvider = await C.CesiumTerrainProvider.fromUrl("terrain/");
-  } catch (e) { /* the imagery still drapes the ellipsoid */ }
+    var terrain = await C.CesiumTerrainProvider.fromUrl("terrain/");
+    if (failed) return;
+    terrain.errorEvent.addEventListener(failLoad);
+    viewer.terrainProvider = terrain;
+  } catch (e) { failLoad(); return; }
   var img = new C.UrlTemplateImageryProvider({
     url: "imagery/{z}/{x}/{y}.jpg", tilingScheme: new C.WebMercatorTilingScheme(),
     rectangle: BOUNDS, minimumLevel: 8, maximumLevel: 13
   });
+  img.errorEvent.addEventListener(failLoad);
   viewer.imageryLayers.addImageryProvider(img);
-  var wind = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+  var windSource = new C.UrlTemplateImageryProvider({
     url: "wind/{z}/{x}/{y}.png", tilingScheme: new C.WebMercatorTilingScheme(),
     rectangle: BOUNDS, minimumLevel: 8, maximumLevel: 13
-  }));
+  });
+  windSource.errorEvent.addEventListener(failLoad);
+  var wind = viewer.imageryLayers.addImageryProvider(windSource);
   wind.alpha = 0.5;
 
   var camera = viewer.camera, D = C.Math.toRadians;
@@ -152,7 +182,12 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
     return { t: t, h: camera.heading, p: camera.pitch, r: C.Cartesian3.distance(camera.position, t) };
   }
   var anim = 0;
+  function stopCamera() { anim++; camera.cancelFlight(); }
+  // Cancel before Cesium handles the same gesture; do not consume native camera input.
+  scene.canvas.addEventListener("pointerdown", stopCamera, { capture: true, passive: true });
+  scene.canvas.addEventListener("wheel", stopCamera, { capture: true, passive: true });
   function place(t, h, p, r, instant) {
+    stopCamera();
     p = Math.min(PITCH_MAX, Math.max(PITCH_MIN, p)); r = Math.min(RANGE_MAX, Math.max(RANGE_MIN, r));
     var from = pose(), id = ++anim, t0 = performance.now(), dur = instant || reduce ? 0 : 450;
     var dh = ((h - from.h + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -167,7 +202,7 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
   }
   function sync() { mode3d.setAttribute("aria-pressed", String(camera.pitch > D(-80))); }
   function topView(instant) {
-    anim++;
+    stopCamera();
     var o = { destination: TOP, orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 } };
     if (instant || reduce) { camera.setView(o); sync(); scene.requestRender(); }
     else camera.flyTo(Object.assign(o, { duration: 1.2, complete: sync }));
@@ -202,13 +237,15 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
   });
 
   // Phones: a simple, slowly orbiting 3D view with one pause control (held still under reduced motion).
-  var orbitBtn = document.getElementById("orbit"), orbiting = false, orbitH = D(-20), orbitId = 0;
+  var orbitBtn = document.getElementById("orbit"), orbiting = false, orbitWanted = false, orbitH = D(-20), orbitId = 0;
   var PAUSE = "Pause", PLAY = "Play";
   function orbitFrame() {
     camera.lookAt(HOME, new C.HeadingPitchRange(orbitH, D(-30), 90000));
     scene.requestRender();
   }
   function orbit(on) {
+    orbitWanted = on && !reduce && !failed;
+    on = orbitWanted && shown;
     orbiting = on; orbitBtn.textContent = on ? PAUSE : PLAY;
     var id = ++orbitId, last = performance.now();
     if (on) requestAnimationFrame(function tick(now) {
@@ -218,8 +255,9 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
     });
   }
   orbitBtn.addEventListener("click", function () { orbit(!orbiting); });
-  document.addEventListener("visibilitychange", function () { if (document.hidden && orbiting) orbit(false); });
+  document.addEventListener("visibilitychange", function () { if (document.hidden) orbit(false); });
 
+  reduce = motion.matches; // The preference may have changed while terrain was loading.
   var qs = new URLSearchParams(location.search);
   if (qs.has("bare")) document.body.classList.add("bare");
   var phone = qs.has("phone") || matchMedia("(max-width: 30em)").matches;
@@ -227,16 +265,26 @@ button:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 2p
     document.body.classList.add("phone");
     scene.screenSpaceCameraController.enableInputs = false;
     orbitFrame();
-    if (!reduce) { orbitBtn.hidden = false; orbit(true); }
+    orbitBtn.hidden = reduce; orbit(!reduce);
   } else if (qs.get("view") === "3d") { topView(true); view3d(true); }
   else topView(true);
-
-  // Reveal once the first view's tiles have loaded.
-  var shown = false;
-  globe.tileLoadProgressEvent.addEventListener(function (n) {
-    if (!shown && n === 0 && globe.tilesLoaded) { shown = true; document.body.classList.add("ready"); status.textContent = ""; }
+  motion.addEventListener("change", function () {
+    reduce = motion.matches;
+    if (reduce) { stopCamera(); orbit(false); sync(); scene.requestRender(); }
+    // Never restart motion automatically when the preference changes back.
+    if (phone) orbitBtn.hidden = reduce || failed;
   });
-  setTimeout(function () { if (!shown) { shown = true; document.body.classList.add("ready"); status.textContent = ""; } }, 12000);
+
+  // An empty queue can follow failed requests. Provider/render errors remain authoritative.
+  var loadingSeen = false;
+  globe.tileLoadProgressEvent.addEventListener(function (n) {
+    if (n > 0) loadingSeen = true;
+    if (!failed && !shown && loadingSeen && n === 0 && globe.tilesLoaded) {
+      shown = true; controls(false);
+      document.body.classList.add("ready"); status.textContent = "";
+      if (phone) orbit(orbitWanted);
+    }
+  });
 })();
 </script>
 </body>

@@ -398,6 +398,30 @@ html[data-skin="field-station"] .c-code::after { background: linear-gradient(var
   }
 }
 
+/* Give the selected desktop views more usable space without reducing text. */
+@media (min-width: 64em) and (min-height: 36em) {
+  html[data-skin="field-station"].js[data-view="stage"][data-console="board"] .deck { grid-template-columns: 11rem minmax(0, 1fr) 14rem; }
+  html[data-skin="field-station"].js[data-view="stage"] {
+    & .c-board { padding: .5rem 1rem 1rem; }
+    & .console.c-board .c-head { gap: 0 2rem; margin-bottom: .3rem; }
+    & .console.c-board .c-code, & .c-board .bd-ratios { margin-bottom: 0; }
+    & .c-board .bd-scroll { margin-top: 0; }
+    & .c-board .bd-table { table-layout: auto; }
+    & .c-board .bd-table :is(td, th) { padding: .2rem .4rem; }
+    & .c-board .bd-dom th { padding-block: .25rem; }
+    & .c-system .sy-grid { display: flex; flex-direction: column; align-items: stretch; }
+    & .c-system .sy-stepper { margin: 0; padding: .5rem 1rem; background: var(--fs-glass); }
+    & .c-system .sy-side { grid-template-columns: minmax(0, 1fr); }
+    & .c-system .sy-fig { width: 100%; box-sizing: border-box; }
+    & .c-apps .c-body > #bay-geobase { margin-top: 0; padding-top: .5rem; }
+    & #bay-geobase .pads { grid-template-columns: 1.25fr 1.3fr 1fr 1fr 1.25fr 2fr; }
+    & #bay-geobase .pad { padding-inline: .35rem; gap: .1rem .25rem; }
+    & #bay-geobase .pad-k { grid-row: auto; }
+    & #bay-geobase .pad-s { grid-column: 1 / -1; }
+    & #bay-geobase .bay-cav { padding-block: .3rem; }
+  }
+}
+
 /* Station mode (?station=): the photograph and the frame alone around one console. */
 @media (min-width: 64em) and (min-height: 36em) {
   html[data-skin="field-station"].js[data-station][data-view="stage"] .c-standby .badge { right: 1.25rem; bottom: 1.25rem; }

@@ -213,6 +213,7 @@ kbd { display: inline-block; min-width: 1.6rem; padding: 0.1rem 0.4rem; border: 
 
 /* 02 system: the stage SVG (stage.py classes) */
 .sy-grid { display: grid; gap: 2rem; }
+.sy-grid > .sy-stepper { grid-column: 1 / -1; }
 .sy-fig { margin: 0; }
 .sy-title { margin: 0 0 0.75rem; font-family: var(--display); font-weight: 600; font-size: 1.0625rem; color: var(--head); }
 .sys-svg { width: 100%; height: auto; font-family: var(--body); overflow: hidden; }
@@ -661,3 +662,13 @@ html.js[data-station] .d-pad9, html.js[data-station] .d-foot, html.js[data-stati
   a { color: #000000 !important; }
   .mk-exists { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
+
+/* Enlarged static detail preserves the existing overview geometry. */
+.sy-fig, .sy-detailbox { min-width: 0; }
+.sy-detailbox { grid-column: 1 / -1; margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--ground); border-block: var(--deck-hair); }
+.sy-detailbox > summary { display: list-item; min-height: 2.75rem; padding-block: 0.75rem; cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 0.9375rem; color: var(--head); }
+.sy-detail-hint { margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--text-2); }
+.sy-detail-scroll { max-width: 100%; max-height: min(70vh, 42rem); overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; margin-bottom: 0.75rem; }
+.sy-detail-scroll:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: -2px; }
+.sy-detail-scroll .sys-detail { display: block; width: 100%; min-width: 67rem; max-width: none; height: auto; max-height: none; }
+@media print { .sy-detailbox { display: none !important; } }
