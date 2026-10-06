@@ -1,0 +1,89 @@
+/* I-4 Dossier: paper evidence sheets at the center of a dark photographic surround (astra's
+   Evidence Bench). Default view: Document (every sheet in reading order); Stage shows one sheet
+   at a time with the consoles as tabs and the nine applications as a restrained pad below.
+   Photographs never sit under paper: the surround is one fixed field behind the sheets. */
+
+html[data-skin="dossier"] body { background: var(--ground); }
+html[data-skin="dossier"] .deck::before {
+  content: ""; position: fixed; inset: 0; z-index: -2;
+  background: linear-gradient(rgb(1 11 19 / 0.8), rgb(1 11 19 / 0.88)), url("../../assets/photos/overcast-horizon-1280.jpg") 50% 58% / cover no-repeat;
+}
+@media (max-width: 47.5em) {
+  html[data-skin="dossier"] .deck::before { background-image: linear-gradient(rgb(1 11 19 / 0.8), rgb(1 11 19 / 0.88)), url("../../assets/photos/overcast-horizon-720.jpg"); }
+}
+
+/* The sheet: paper tokens remapped inside every console, so each component reads in the paper register. */
+html[data-skin="dossier"] .console {
+  --head: #15191d; --text: #15191d; --text-2: #474c51; --text-3: #575b5e;
+  --raised: #f4f0e7; --overlay: #e2dccf; --line: #d2cabb; --line-ui: #8a8478;
+  --deck-glass: transparent; --deck-hair: 1px solid #d2cabb;
+  --gold: #6b4f17; --amber: #8a5a1e; --salmon: #8a4a33; --fog: #4f5356; --fog-2: #6a6862;
+  --red-on-dark: #b02821; --ground: #ece7dc;
+  max-width: 64rem; margin: clamp(1rem, 0.5rem + 2vw, 2.5rem) auto; padding: clamp(1.75rem, 1rem + 3vw, 3.5rem) clamp(1.25rem, 0.5rem + 3.5vw, 3.75rem);
+  background: var(--paper); color: var(--ink); font-weight: 400; border: 0;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.06), 0 1.5rem 3rem rgb(0 0 0 / 0.45);
+}
+html[data-skin="dossier"] .console :focus-visible { outline-color: var(--ink); }
+html[data-skin="dossier"] .console .c-photo, html[data-skin="dossier"] .bay .c-photo { display: none; }
+html[data-skin="dossier"] .c-code { border-bottom: 2px solid var(--ink); padding-bottom: 0.5rem; }
+html[data-skin="dossier"] .c-lede { color: var(--ink-2); }
+html[data-skin="dossier"] .c-notshown { color: var(--ink-2); border-top-color: var(--ink-3); }
+html[data-skin="dossier"] .console .btn-quiet { color: var(--ink); border-color: var(--ink-3); }
+html[data-skin="dossier"] .console .btn-quiet:hover { background: var(--paper-2); }
+html[data-skin="dossier"] .console .btn-quiet[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+html[data-skin="dossier"] .chip-demo { color: #8a4a33; }
+html[data-skin="dossier"] .chip-recorded, html[data-skin="dossier"] .chip-public { color: #6b4f17; border-color: #6b4f17; }
+html[data-skin="dossier"] .rcpt { color: var(--ink-2); border-color: var(--ink-3); }
+html[data-skin="dossier"] .stamp { color: var(--ink-2); border-color: var(--ink-3); }
+html[data-skin="dossier"] .tl-datum { border-color: var(--ink); }
+html[data-skin="dossier"] .sq li::marker { color: var(--red-alt); }
+html[data-skin="dossier"] .sv-tier[aria-current], html[data-skin="dossier"] .t-rec[aria-current], html[data-skin="dossier"] .sy-st[aria-current] { background: var(--paper-2); }
+/* The standby sheet keeps ATNI's institutional identity in ink. */
+html[data-skin="dossier"] .sb-word { color: var(--ink); }
+html[data-skin="dossier"] .sb-eyebrow { color: var(--red-alt); }
+html[data-skin="dossier"] .sb-status, html[data-skin="dossier"] .sb-lede { color: var(--ink); }
+/* The stage diagram on paper */
+html[data-skin="dossier"] .sys-svg .tile { fill: #f4f0e7; stroke: #8a8478; }
+html[data-skin="dossier"] .sys-svg .svc-box { fill: rgb(236 231 220 / 0.6); }
+html[data-skin="dossier"] .sys-svg :is(.tsdf-lbg, .cap, .station) { fill: var(--paper); }
+html[data-skin="dossier"] .sys-svg .stamp rect, html[data-skin="dossier"] .sys-svg .arrow-head { fill: var(--paper); }
+html[data-skin="dossier"] .tier-t0 { fill: #e7e1d4; stroke: #8a8478; }
+html[data-skin="dossier"] .tier-t1 { fill: #ddd5c6; stroke: #6f6a61; }
+html[data-skin="dossier"] .tier-t2 { fill: #d6c7bd; stroke: #8a4a33; }
+html[data-skin="dossier"] .tier-t3 { fill: #cdb6ad; stroke: #8a4a33; }
+html[data-skin="dossier"] .sv-fig[data-tier] .tier { stroke-width: 1.5; }
+html[data-skin="dossier"] .sv-fig[data-tier="t0"] .tier-t0, html[data-skin="dossier"] .sv-fig[data-tier="t1"] .tier-t1,
+html[data-skin="dossier"] .sv-fig[data-tier="t2"] .tier-t2, html[data-skin="dossier"] .sv-fig[data-tier="t3"] .tier-t3 { stroke: var(--ink); stroke-width: 3; }
+html[data-skin="dossier"] .stop { fill: #8a4a33; }
+html[data-skin="dossier"] .receipt { border-color: var(--ink); }
+
+/* Chrome in the surround */
+html[data-skin="dossier"] .d-status, html[data-skin="dossier"] .d-truths, html[data-skin="dossier"] .d-rail { background: rgb(1 11 19 / 0.9); }
+html[data-skin="dossier"] .d-rail ol { justify-content: center; }
+html[data-skin="dossier"] .d-truths { justify-content: center; }
+html[data-skin="dossier"] .d-foot { background: rgb(1 11 19 / 0.92); }
+
+@media (min-width: 64em) and (min-height: 36em) {
+  html.js[data-skin="dossier"][data-view="stage"] .deck {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "status" "truths" "rail" "field" "pad9" "foot";
+  }
+  html.js[data-skin="dossier"][data-view="stage"] .d-tape { display: none; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-rail { border-right: 0; border-bottom: var(--deck-hair); padding: 0 var(--gutter); overflow: visible; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-rail ol { flex-direction: row; justify-content: center; gap: 0; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-rail a { border-left: 0; border-bottom: 3px solid transparent; padding-inline: 0.9rem; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-rail a[aria-current] { border-bottom-color: var(--atni-red); background: transparent; }
+  html.js[data-skin="dossier"][data-view="stage"] .console { margin-block: 1.5rem; min-height: 0; padding: clamp(1.5rem, 0.5rem + 2vw, 3rem); }
+  html.js[data-skin="dossier"][data-view="stage"] .c-apps { padding-top: 0; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 { border: 0; border-top: var(--deck-hair); background: rgb(1 11 19 / 0.9); padding: 0.4rem var(--gutter); }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 ol { grid-template-columns: repeat(9, minmax(0, 1fr)); max-width: 64rem; margin: 0 auto; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 a { min-height: 2.75rem; grid-template-rows: auto; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 0.35rem; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 .p9-k { display: none; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 .mk { position: static; order: -1; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 a { grid-template-columns: auto minmax(0, 1fr); }
+  html.js[data-skin="dossier"][data-view="stage"] .d-pad9 time { grid-column: 2; }
+  html.js[data-skin="dossier"][data-view="stage"] .d-truths { flex-wrap: nowrap; padding-block: 0.4rem; }
+  html.js[data-skin="dossier"][data-view="stage"] .tr-nums li { font-size: 0.875rem; }
+  html.js[data-skin="dossier"][data-view="stage"] .tr-leave { font-size: 0.875rem; }
+}

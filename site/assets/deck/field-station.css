@@ -1,0 +1,407 @@
+/* I-1 Field Station: the photo-led HUD. One of Patrick Freeland's photographs fills the station behind
+   glass (skin.js clones the current console's own photograph into a fixed backdrop); the chrome is a
+   thin HUD frame of hairlines, corner brackets, tracked League Spartan caps and drawn double-slash
+   codes, with panel rules made by 1 px grid gaps. The field changes, the frame never moves.
+   Reading mode: the photograph is dimmed behind text-heavy consoles (board, bays, timeline,
+   objectives, ledger) and breathes on Standby, System and Sovereignty, where every text block sits on
+   its own glass plate. Standby keeps ATNI Design System colors (D29, D33).
+   Heading colors over photographs are literal samples, recorded with coordinates in
+   scratch/qa/s5/field-station/samples.json. Nothing here moves at rest. */
+
+html[data-skin="field-station"] {
+  --fs-hair: rgb(232 236 240 / 0.14);
+  --fs-hair-2: rgb(232 236 240 / 0.28);
+  --fs-tick: rgb(232 236 240 / 0.32);
+  --fs-glass: rgb(1 11 19 / 0.88);
+  --fs-glass-hi: rgb(11 18 25 / 0.9);
+  --fs-chrome: rgb(1 11 19 / 0.9);
+  --fs-br-c: rgb(232 236 240 / 0.5);
+  --fs-br-l: 0.75rem;
+  --fs-slash: rgb(232 236 240 / 0.5);
+  --deck-glass: rgb(1 11 19 / 0.84);
+  --fs-title: var(--head);
+}
+
+/* Corner brackets as background layers (no extra elements); the color can change per element. */
+html[data-skin="field-station"] :is(.c-head, .panel, .pad, .d-pad9 a, .sy-fig, .sy-side, .sv-grid, .sv-princ li, .sv-lede, .bd-proj, .tl-datum, .fs-plate, .c-notshown, .d-rail a, .bay-cav) {
+  --fs-br:
+    linear-gradient(var(--fs-br-c) 0 0) 0 0 / var(--fs-br-l) 1px no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 0 0 / 1px var(--fs-br-l) no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 100% 0 / var(--fs-br-l) 1px no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 100% 0 / 1px var(--fs-br-l) no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 0 100% / var(--fs-br-l) 1px no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 0 100% / 1px var(--fs-br-l) no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 100% 100% / var(--fs-br-l) 1px no-repeat,
+    linear-gradient(var(--fs-br-c) 0 0) 100% 100% / 1px var(--fs-br-l) no-repeat;
+}
+
+/* ------------------------------------------------------------------ the tactical voice (both views) */
+html[data-skin="field-station"] {
+  /* Drawn double slash after every code: two hairline diagonals, no glyphs. */
+  & :is(.c-num, .d-crumb-code, .r-code, .pn-k, .sy-n) { flex: none; white-space: nowrap; }
+  & :is(.c-num, .d-crumb-code, .r-code, .pn-k, .sy-n)::after {
+    content: ""; display: inline-block; width: 0.62em; height: 0.78em; margin-left: 0.4em; vertical-align: -0.04em;
+    background:
+      linear-gradient(to top left, transparent calc(50% - 0.6px), var(--fs-slash) calc(50% - 0.6px) calc(50% + 0.6px), transparent calc(50% + 0.6px)) 0 0 / 45% 100% no-repeat,
+      linear-gradient(to top left, transparent calc(50% - 0.6px), var(--fs-slash) calc(50% - 0.6px) calc(50% + 0.6px), transparent calc(50% + 0.6px)) 100% 0 / 45% 100% no-repeat;
+  }
+  & .c-ledger { --fs-title: var(--ink); }
+  & .c-ledger .c-lede { color: var(--ink-2); }
+  & .c-ledger .c-code { color: var(--ink-2); }
+  & .c-ledger { --fs-slash: rgb(21 25 29 / 0.55); --fs-hair: rgb(21 25 29 / 0.18); --fs-hair-2: rgb(21 25 29 / 0.32); --fs-tick: rgb(21 25 29 / 0.4); --fs-br-c: rgb(21 25 29 / 0.5); }
+
+  /* Console header: code line with a hairline running to a short tick scale. */
+  & .c-code { max-width: none; align-items: center; gap: 0.5rem; letter-spacing: 0.18em; color: var(--text-2); }
+  & .c-code::after {
+    content: ""; flex: 1 1 auto; min-width: 2rem; height: 7px;
+    background:
+      repeating-linear-gradient(90deg, var(--fs-tick) 0 1px, transparent 1px 6px) 100% 0 / 3.05rem 100% no-repeat,
+      linear-gradient(var(--fs-hair-2) 0 0) 0 50% / calc(100% - 3.6rem) 1px no-repeat;
+  }
+  & .c-num { letter-spacing: 0.06em; }
+  & .c-title { color: var(--fs-title); }
+  & .c-lede { color: var(--text); }
+  & .c-notshown { border-top: 0; padding: 0.55rem 0.75rem; font-size: 0.8125rem; letter-spacing: 0.01em; color: var(--text-2); background: var(--fs-br); }
+
+  /* Sampled title colors (photo-derived atmosphere; see samples.json). */
+  & .c-system { --fs-title: #e7d9ac; }
+  & .c-timeline { --fs-title: #fbfaf8; }
+  & .c-objectives { --fs-title: #cfd4b0; }
+  & .c-sovereignty { --fs-title: #e8ceb3; }
+  & #bay-ddm { --fs-title: #d3c2b0; }
+  & #bay-cast { --fs-title: #e7d9ac; }
+  & #bay-geobase { --fs-title: #d4c6af; }
+  & #bay-lua { --fs-title: #efc392; }
+  & #bay-sentinel { --fs-title: #b8bb88; }
+  & #bay-tcr { --fs-title: #e4edec; }
+  & #bay-plan { --fs-title: #d4d2b0; }
+  & #bay-resist { --fs-title: #cfd1b3; }
+  & #bay-navigator { --fs-title: #c8d1af; }
+  & .bay-h { color: var(--fs-title); }
+
+  /* Status line */
+  & .d-status { background: var(--fs-chrome); border-bottom: 1px solid var(--fs-hair-2); }
+  & .d-word { letter-spacing: 0.08em; --track: 0.08em; }
+  & .d-crumb { letter-spacing: 0.12em; }
+  & .d-switch { border-color: var(--line-ui); }
+  & .d-switch button { letter-spacing: 0.14em; }
+  & .d-clock .dt-l, & .d-rc { letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--display); font-weight: 500; font-size: 0.75rem; }
+  & .d-clock time { font-size: 0.9375rem; }
+  & .d-rc b { font-weight: 600; letter-spacing: 0.02em; }
+
+  /* Truth strip: tabular readouts with hairline separators */
+  & .d-truths { background: var(--fs-chrome); border-bottom: 1px solid var(--fs-hair); }
+  & .tr-nums { gap: 0.35rem 0; }
+  & .tr-nums li { padding: 0 1.1rem; border-left: 1px solid var(--fs-hair-2); font-size: 0.8125rem; letter-spacing: 0.04em; color: var(--text-2); }
+  & .tr-nums li:first-child { padding-left: 0; border-left: 0; }
+  & .tr-nums b { font-size: 1.25rem; letter-spacing: 0; }
+  & .tr-leave { font-size: 0.9375rem; }
+
+  /* Console rail */
+  & .d-rail { background: var(--fs-chrome); }
+  & .d-rail a { font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  & .d-rail .r-code { letter-spacing: 0.06em; }
+
+  /* Footer */
+  & .d-foot { background: var(--fs-chrome); border-top: 1px solid var(--fs-hair-2); }
+  & .d-foot .btn-quiet { font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  & .d-ask label { font-size: 0.75rem; letter-spacing: 0.16em; }
+  & .d-credit { font-size: 0.75rem; letter-spacing: 0.04em; }
+
+  /* Instrument glass: panels, pads and tables */
+  & .panel { border-color: var(--fs-hair); background: var(--fs-br), var(--deck-glass); }
+  & .pn-h { font-size: 1rem; letter-spacing: 0.01em; }
+  & .pn-k { letter-spacing: 0.06em; }
+  & .pads { gap: 1px; background: var(--fs-hair); border: 1px solid var(--fs-hair); }
+  & .pad { border: 0; background: var(--fs-glass); }
+  & .pad:hover { background: var(--fs-glass-hi); }
+  & .pad[aria-current] { --fs-br-c: var(--atni-red); background: var(--fs-br), var(--fs-glass-hi); box-shadow: inset 0 -3px 0 var(--atni-red); }
+  & .pad:focus-visible { outline-offset: -3px; }
+  & .pad-l { letter-spacing: 0.16em; }
+  & .bay-kick { letter-spacing: 0.16em; }
+  & .bay-cav { border-left-color: var(--fs-hair-2); background: var(--fs-br), var(--deck-glass); }
+  & .bd-table, & .ob-table { border: 1px solid var(--fs-hair); }
+  & .bd-table th, & .bd-table td, & .ob-table th, & .ob-table td { border-bottom-color: var(--fs-hair); }
+  & .bd-table thead th, & .ob-table thead th { letter-spacing: 0.16em; }
+  & .bd-proj { background: var(--fs-br), rgb(1 11 19 / 0.84); }
+  /* Ratios as readout cells divided by 1 px rules */
+  & .bd-ratios { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1px; background: var(--fs-hair); border: 1px solid var(--fs-hair); }
+  & .ratio { padding: 0.55rem 0.8rem; background: var(--fs-glass); }
+  & .t-item { background: var(--deck-glass); }
+  & .tl-datum { --fs-br-c: rgb(232 236 240 / 0.8); background: var(--fs-br), var(--ground); }
+  & .sv-princ li { border-top-color: var(--fs-hair-2); background: var(--fs-br), var(--fs-glass); }
+  & .sy-st { letter-spacing: 0.02em; }
+  & kbd { border-color: var(--line-ui); background: var(--fs-glass); }
+}
+
+/* Document view keeps each console's own photograph; a slightly deeper veil holds the sampled titles. */
+html[data-skin="field-station"] .console > .c-photo::after { background: rgb(1 11 19 / 0.82); }
+html[data-skin="field-station"] .c-standby > .c-photo::after { background: linear-gradient(90deg, rgb(1 11 19 / 0.92) 0%, rgb(1 11 19 / 0.84) 60%, rgb(1 11 19 / 0.6) 100%); }
+html[data-skin="field-station"] .c-ledger :is(.c-num, .pn-k)::after { --fs-slash: rgb(21 25 29 / 0.55); }
+
+/* Phones: a function's text takes the panel's full measure under its mark and status. */
+@media (max-width: 47.99em) {
+  html[data-skin="field-station"] .fn .fn-t { grid-column: 1 / -1; }
+  /* On a phone the opening text spans the whole photograph, so the scrim does too. */
+  html[data-skin="field-station"] .c-standby > .c-photo::after { background: linear-gradient(180deg, rgb(1 11 19 / 0.9), rgb(1 11 19 / 0.86)); }
+  /* In headings the drawn slash costs measure a narrow column cannot spare. */
+  html[data-skin="field-station"] :is(.pn-k, .sy-n)::after { display: none; }
+  /* Tracked caps are wider than the words: a narrow screen, or large text, gets them untracked. */
+  html[data-skin="field-station"] :is(.d-rail a, .d-foot .btn-quiet, .d-clock .dt-l, .d-rc) { letter-spacing: 0.02em; text-transform: none; }
+  html[data-skin="field-station"] .d-rail a { flex-wrap: wrap; }
+}
+
+/* The backdrop (Stage view only; skin.js sets fs-sky-on). Moment 1: 650 ms crossfade. */
+html[data-skin="field-station"] .decor-deck_start { display: none; }
+html[data-skin="field-station"].fs-sky-on .decor-deck_start { display: block; position: fixed; inset: 0; z-index: -1; }
+html[data-skin="field-station"] .fs-sky, html[data-skin="field-station"] .fs-layer { position: absolute; inset: 0; }
+html[data-skin="field-station"] .fs-layer { opacity: 0; transition: opacity 650ms cubic-bezier(.22, 1, .36, 1); }
+html[data-skin="field-station"] .fs-layer.is-top { z-index: 1; }
+html[data-skin="field-station"] .fs-layer.is-on { opacity: 1; }
+html[data-skin="field-station"] .fs-layer picture { height: 100%; }
+html[data-skin="field-station"] .fs-layer img { width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); }
+html[data-skin="field-station"].fs-sky-on :is(.console, .bay) > .c-photo { display: none; }
+/* Document view: bay photographs only behind the station (page-weight budget); consoles keep theirs. */
+html[data-skin="field-station"]:not(.fs-sky-on) .bay > .c-photo { display: none; }
+
+/* ------------------------------------------------------------------ the station (Stage view) */
+@media (min-width: 64em) and (min-height: 36em) {
+  html[data-skin="field-station"].js[data-view="stage"] {
+    & body { background: var(--ground); }
+    /* Left: navigation (consoles, then the bay pad). Right: the instruments (truth readouts, then the
+       evidence tape). Centre: the field. */
+    & .deck {
+      grid-template-columns: minmax(14rem, 15rem) minmax(0, 1fr) minmax(15rem, 18rem);
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+      grid-template-areas: "status status status" "rail field truths" "rail field tape" "pad9 field tape" "foot foot foot";
+    }
+    & .d-truths { grid-area: truths; display: block; padding: 0.75rem 0.85rem 0.85rem; border-left: 1px solid var(--fs-hair-2); border-bottom: 1px solid var(--fs-hair-2); }
+    & .tr-nums { display: grid; gap: 1px; background: var(--fs-hair); border-block: 1px solid var(--fs-hair); }
+    & .tr-nums li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); align-items: baseline; gap: 0 0.5rem; padding: 0.4rem 0.4rem 0.35rem; border: 0; background: rgb(1 11 19 / 0.94); line-height: 1.35; }
+    & .tr-nums b { font-size: 1.5rem; text-align: right; }
+    & .tr-leave { margin: 0.75rem 0 0; font-size: 0.875rem; line-height: 1.4; }
+    & .d-foot { padding-inline: 1.25rem; }
+    & .d-ask input { width: 18rem; font-size: 0.875rem; }
+    & .d-hint, & .d-credit { font-size: 0.75rem; }
+    /* The field veil and its static hairline grid sit under the field (not in its view-transition
+       snapshot), so the shutter closes over a steady veiled photograph. */
+    & .deck::before {
+      content: ""; grid-area: field; position: relative; z-index: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, rgb(232 236 240 / 0.045) 1px, transparent 1px) 0 0 / 44px 44px,
+        linear-gradient(rgb(232 236 240 / 0.045) 1px, transparent 1px) 0 0 / 44px 44px,
+        var(--fs-veil, rgb(1 11 19 / 0.86));
+    }
+    /* The frame: four brackets and a 32-tick scale on the top edge. It never moves. */
+    & .deck::after {
+      content: ""; grid-area: field; position: relative; z-index: 2; margin: 0.4rem; pointer-events: none;
+      --c: rgb(232 236 240 / 0.62); --l: 1.375rem;
+      background:
+        linear-gradient(var(--c) 0 0) 0 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / 1px var(--l) no-repeat,
+        repeating-linear-gradient(90deg, var(--fs-tick) 0 1px, transparent 1px 3.125%) 50% 0 / 40% 5px no-repeat,
+        repeating-linear-gradient(90deg, rgb(232 236 240 / 0.5) 0 1px, transparent 1px 25%) 50% 0 / 40% 9px no-repeat;
+    }
+    & .d-field { z-index: 1; background: transparent; scrollbar-width: thin; scrollbar-color: rgb(232 236 240 / 0.35) transparent; }
+    & .console { padding: clamp(1.25rem, 0.5rem + 1.4vw, 2rem) clamp(1.25rem, 0.5rem + 1.8vw, 2.5rem); background: transparent; }
+
+    /* Chrome as glass over the photograph */
+    & .d-status { grid-area: status; gap: 0.5rem 1rem; padding-inline: 1.25rem; }
+    & .d-word { font-size: 1.25rem; }
+
+    /* A compact HUD head: code line, then title and lede side by side where they fit. */
+    & .console:not(.c-standby, .c-apps) .c-head { display: grid; grid-template-columns: minmax(auto, max-content) minmax(15rem, 1fr); align-items: end; gap: 0.35rem 2rem; }
+    & .console:not(.c-standby) .c-code { grid-column: 1 / -1; margin-bottom: 0.25rem; }
+    & .console:not(.c-standby) .c-title { margin: 0; }
+    & .console:not(.c-standby) .c-lede { font-size: 1rem; line-height: 1.4; max-width: 46ch; }
+    /* A narrow field (1024 to 1199 px wide, or large text) stacks what sat side by side. Media, not
+       container, queries: inactive consoles are measured while skipped, where container sizes lie. */
+    @media (max-width: 74.99em) {
+      & .console:not(.c-standby, .c-apps) .c-head { display: block; }
+      & .console:not(.c-standby, .c-apps) .c-title { margin-bottom: 0.4rem; }
+      & .lg-grid, & .sv-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    & .d-rail { background: var(--fs-chrome); border-right: 1px solid var(--fs-hair-2); padding: 0.6rem 0.5rem; }
+    & .d-rail ol { gap: 1px; }
+    & .d-rail a { min-height: 2.5rem; border-left: 0; padding: 0.2rem 0.65rem; background: transparent; }
+    & .d-rail a:hover { background: rgb(232 236 240 / 0.06); }
+    & .d-rail a[aria-current] { --fs-br-c: var(--atni-red); background: var(--fs-br), rgb(232 236 240 / 0.07); box-shadow: inset 3px 0 0 var(--atni-red); }
+    & .d-rail a:focus-visible { outline-offset: -3px; }
+    & .d-pad9 { background: var(--fs-chrome); border-right: 1px solid var(--fs-hair-2); border-top: 1px solid var(--fs-hair-2); padding: 0.6rem 0.5rem 0.65rem; }
+    & .d-pad9 ol { gap: 1px; background: var(--fs-hair-2); border: 1px solid var(--fs-hair-2); }
+    & .d-pad9 li { display: grid; }
+    & .d-pad9 a { border: 0; background: rgb(1 11 19 / 0.94); min-height: 3.6rem; padding: 0.35rem 0.35rem 0.3rem; }
+    & .d-pad9 a:hover { background: var(--overlay); }
+    & .d-pad9 a[aria-current] { --fs-br-c: var(--atni-red); background: var(--fs-br), var(--overlay); box-shadow: inset 0 -3px 0 var(--atni-red); }
+    & .d-pad9 a:focus-visible { outline-offset: -3px; }
+    & .d-pad9 .p9-k { letter-spacing: 0.06em; }
+    & .d-pad9 .p9-n { letter-spacing: 0.02em; }
+    & .d-tape { background: var(--fs-chrome); border-left: 1px solid var(--fs-hair-2); padding: 0.75rem 0.85rem; scrollbar-width: thin; scrollbar-color: rgb(232 236 240 / 0.3) transparent; }
+    /* Not flex: type.js splits kerned letters into spans, and flex would gap them apart. */
+    & .d-label { font-family: var(--display); font-weight: 600; letter-spacing: 0.2em; --track: 0.2em; color: var(--text); padding-right: 3rem;
+      background: repeating-linear-gradient(90deg, var(--fs-tick) 0 1px, transparent 1px 6px) 100% 50% / 2.45rem 7px no-repeat; }
+    & .tp-list { gap: 1px; background: var(--fs-hair); border-block: 1px solid var(--fs-hair); }
+    & .tp-list li { background: rgb(1 11 19 / 0.94); }
+    & .tp-list a { border-left: 0; padding: 0.45rem 0.4rem; }
+    & .tp-list a:hover { background: var(--overlay); }
+    & .tp-list a:focus-visible { outline-offset: -3px; }
+    & .tp-app { letter-spacing: 0.02em; }
+    & .d-foot { background: var(--fs-chrome); }
+
+    /* Reading mode: dim behind text-heavy consoles; let the photograph breathe on three. */
+    &[data-console="standby"] { --fs-veil: linear-gradient(90deg, rgb(1 11 19 / 0.9) 0, rgb(1 11 19 / 0.86) 45rem, rgb(1 11 19 / 0.5) 58rem, rgb(1 11 19 / 0.32) 100%); }
+    &[data-console="system"], &[data-console="sovereignty"] { --fs-veil: rgb(1 11 19 / 0.5); }
+    &[data-console="ledger"] { --fs-veil: var(--paper); }
+
+    /* Breathing consoles: every text block on its own glass plate, the photograph between them. */
+    & :is(.c-system, .c-sovereignty) :is(.c-head, .sy-fig, .sy-side, .sv-lede, .sv-grid, .c-notshown),
+    & .c-sovereignty .c-body > .d-h3 {
+      padding: 1rem 1.15rem; border: 1px solid var(--fs-hair); background: var(--fs-br), var(--fs-glass);
+    }
+    & :is(.c-system, .c-sovereignty) .c-head { margin-bottom: 1rem; }
+    & :is(.c-system, .c-sovereignty) .c-lede { max-width: 62ch; }
+    & .c-sovereignty .c-body > .d-h3 { display: block; width: fit-content; margin-bottom: 0; padding: 0.6rem 1.15rem; }
+    & .c-sovereignty .sv-princ { margin-top: 1px; gap: 1rem; }
+    & .c-sovereignty .sv-lede { max-width: 66ch; }
+    & .c-sovereignty .sv-grid { gap: 1.5rem; }
+    /* System: the figure takes the full field width; the stepper and step text sit beneath it. */
+    & .c-system .sy-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+    & .c-system .sys-wide { max-height: calc(100dvh - 17rem); }
+    & .c-system .sy-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 1.5rem; align-items: start; }
+    @media (min-width: 85em) { & .c-system .sy-side { grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr); } }
+    & .c-system .sy-stepper { margin: 0 0 1rem; }
+    @media (min-width: 85em) { & .c-system .sy-stepper { grid-row: span 2; margin: 0; } }
+    & .c-system .sy-texts { min-width: 0; }
+    & .c-system .d-ctrl { margin: 0.25rem 0 0; }
+    & :is(.c-system, .c-sovereignty) .c-notshown { width: fit-content; max-width: 70ch; margin-top: 1rem; }
+
+    /* Standby: the opening screen in ATNI Design System colors over the photograph */
+    & .c-standby .c-frame { padding-right: 0; }
+    & .c-standby :is(.c-head, .c-body > *, .c-notshown) { max-width: 40rem; }
+    & .c-standby .c-head { display: grid; grid-template-columns: max-content minmax(14rem, 1fr); align-items: end; gap: 0.25rem 1.5rem; }
+    & .c-standby .c-code { grid-column: 1 / -1; }
+    & .c-standby .c-lede { font-size: 0.9375rem; line-height: 1.4; }
+    & .c-standby .sb-eyebrow { max-width: none; }
+    & .c-standby .sb-line { font-size: 1rem; }
+    & .c-standby .c-head { margin-bottom: 0.9rem; }
+    & .c-standby .c-code { margin-bottom: 0.35rem; }
+    & .c-standby .c-title { font-size: clamp(1.75rem, 1.2rem + 1vw, 2.25rem); margin-bottom: 0.3rem; }
+    & .c-standby .c-lede { font-size: 1rem; }
+    & .c-standby .sb-id { margin-bottom: 0.5rem; padding-left: 1rem; border-left: 3px solid var(--atni-red); }
+    & .c-standby .sb-eyebrow { margin-bottom: 0.4rem; letter-spacing: 0.14em; }
+    & .c-standby .sb-word { font-size: clamp(3.75rem, min(6vw, 10dvh) + 1rem, 6.5rem); letter-spacing: 0.02em; --track: 0.02em; }
+    & .c-standby .sb-exp { font-size: 1.1875rem; margin-top: 0.4rem; }
+    & .c-standby .c-body > * + * { margin-top: 0.7rem; }
+    & .c-standby .sb-line { margin-bottom: 0; }
+    & .c-standby .sb-lede { font-size: 0.9375rem; line-height: 1.5; }
+    & .c-standby .sb-status { font-size: 0.9375rem; line-height: 1.5; color: var(--text); }
+    & .c-standby .c-notshown { margin-top: 1rem; }
+    & .c-standby .badge { position: fixed; right: calc(min(18rem, 22vw) + 1.25rem); bottom: 4.25rem; max-width: none; }
+
+    /* Text-heavy consoles read on a deep veil; their head is a quiet HUD band. */
+    & .c-board .c-head, & .c-timeline .c-head, & .c-objectives .c-head { margin-bottom: 1rem; }
+    & .c-board .bd-table { table-layout: fixed; }
+    & .c-board .bd-table thead th:nth-child(1) { width: 26%; }
+    & .c-board .bd-table thead th:nth-child(2) { width: 15%; }
+    & .c-board .bd-table thead th:nth-child(3) { width: 16%; }
+    & .c-board .bd-table thead th:nth-child(4) { width: 18%; }
+    & .c-board .bd-stage { white-space: normal; }
+    & .c-board .bd-table :is(th, td) { padding: 0.5rem 0.6rem; }
+    & .c-board .bd-app a { font-size: 0.9375rem; }
+    & .c-objectives .ob-table { table-layout: fixed; }
+    & .c-objectives .ob-table thead th:first-child { width: 26%; }
+    & .c-objectives .ob-table thead th { font-size: 0.625rem; letter-spacing: 0.05em; padding-inline: 0.3rem; hyphens: manual; }
+    & .c-objectives .ob-h { min-width: 0; }
+    & .c-objectives .ob-table :is(td, th) { padding-inline: 0.35rem; }
+
+    /* Bays */
+    & .bay { padding-top: clamp(1.25rem, 0.5rem + 1.4vw, 2rem); }
+    & .bay-h { font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.25rem); }
+    & .bay-one { margin-bottom: 0.6rem; max-width: 62ch; }
+    & .bay-meta { margin-bottom: 0.75rem; }
+    & .bay-cav { margin-bottom: 1rem; }
+    & :is(.panel, .bay-cav, .t-item, .sv-tier, .sv-princ li, .sy-tx p) { font-size: 0.9375rem; line-height: 1.55; }
+    & .sv-lede { font-size: 1rem; line-height: 1.5; }
+    & .pads { margin-bottom: 1rem; }
+    & .pad { min-height: 3.5rem; }
+    & .pad-l { letter-spacing: 0.1em; font-size: 0.75rem; }
+  }
+}
+
+/* Session 6 polish (Lens C, astra 3 and 5): fewer decorative marks, so the photograph carries the
+   station; denser board, bays and System at 1280x720. Later rules win over the ones above. */
+html[data-skin="field-station"] .c-code::after { background: linear-gradient(var(--fs-hair-2) 0 0) 0 50% / 100% 1px no-repeat; }
+@media (min-width: 64em) and (min-height: 36em) {
+  html[data-skin="field-station"].js[data-view="stage"] {
+    & .deck::before { background: var(--fs-veil, rgb(1 11 19 / 0.86)); }
+    & .deck::after {
+      background:
+        linear-gradient(var(--c) 0 0) 0 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / 1px var(--l) no-repeat;
+    }
+    & .d-label { padding-right: 0; background: none; }
+
+    /* Board: three or more rows in view at 1280x720. */
+    & .c-board .c-head { margin-bottom: 0.6rem; }
+    & .c-board .bd-ratios { margin-bottom: 0.6rem; }
+    & .c-board .ratio { padding: 0.3rem 0.7rem; font-size: 0.875rem; line-height: 1.35; }
+    & .c-board .ratio b { font-size: 1.25rem; }
+    & .c-board .bd-table { font-size: 0.875rem; line-height: 1.4; }
+    & .c-board .bd-table :is(th, td) { padding: 0.4rem 0.55rem; }
+    & .c-board .bd-table thead th { padding-block: 0.35rem; }
+    & .c-board .bd-tile { font-size: 0.75rem; line-height: 1.35; }
+    & .c-board .bd-dom th { padding-top: 0.5rem; }
+    & .c-board .dt-l { font-size: 0.6875rem; }
+    & .c-board .bd-table thead th:nth-child(1) { width: 23%; }
+    & .c-board .bd-table thead th:nth-child(2) { width: 15%; }
+    & .c-board .bd-table thead th:nth-child(3) { width: 13%; }
+    & .c-board .bd-table thead th:nth-child(4) { width: 16%; }
+    & .c-board .bd-lk { font-size: 0.8125rem; line-height: 1.35; }
+    & .c-board .lk + .lk { margin-top: 0.3rem; }
+
+    /* Bays: the open panel starts higher. */
+    & .bay { padding-top: 1rem; }
+    & .bay-h { font-size: clamp(1.625rem, 1.1rem + 1vw, 2rem); margin-bottom: 0.25rem; }
+    & .bay-one { margin-bottom: 0.4rem; font-size: 1rem; line-height: 1.45; }
+    & .bay-meta { margin-bottom: 0.5rem; }
+    & .bay-cav { margin-bottom: 0.6rem; padding-block: 0.45rem; font-size: 0.875rem; line-height: 1.45; }
+    & .pads { margin-bottom: 0.6rem; }
+    & .pad { min-height: 0; padding-block: 0.4rem; }
+    & .pad-s { font-size: 0.8125rem; line-height: 1.35; }
+
+    /* System: the figure fitted, its stepper in view beneath it as one row. */
+    & .c-system .c-head { margin-bottom: 0.6rem; padding-block: 0.5rem; }
+    & .c-system .c-title { font-size: 2rem; }
+    & .c-system .sys-wide { max-height: calc(100dvh - 22rem); }
+    /* The outcome caption and the closed key share one row under the picture. */
+    & .c-system .sy-fig { padding-block: 0.6rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 1.5rem; }
+    & .c-system .sy-fig > :not(.sy-outcap, .sys-keybox), & .c-system .sys-keybox[open] { grid-column: 1 / -1; }
+    & .c-system .sy-outcap { margin: 0.25rem 0 0; }
+    & .c-system .sys-keybox { margin-top: 0.25rem; border: 0; }
+    & .c-system .sy-grid { gap: 0.6rem; }
+    & .c-system .sy-side { grid-template-columns: minmax(0, 1fr); }
+    & .c-system .sy-stepper { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin: 0 0 0.5rem; grid-row: auto; }
+  }
+}
+
+/* Station mode (?station=): the photograph and the frame alone around one console. */
+@media (min-width: 64em) and (min-height: 36em) {
+  html[data-skin="field-station"].js[data-station][data-view="stage"] .c-standby .badge { right: 1.25rem; bottom: 1.25rem; }
+}
+
+@media print {
+  html[data-skin="field-station"] :is(.c-num, .d-crumb-code, .r-code, .pn-k, .sy-n)::after, html[data-skin="field-station"] .c-code::after { display: none; }
+  html[data-skin="field-station"] :is(.panel, .pad, .c-notshown, .bay-cav, .bd-proj, .sv-princ li, .tl-datum) { background: none !important; }
+}
