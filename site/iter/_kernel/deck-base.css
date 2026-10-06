@@ -196,7 +196,9 @@ kbd { display: inline-block; min-width: 1.6rem; padding: 0.1rem 0.4rem; border: 
 .bd-app a:hover { text-decoration: underline; }
 .bd-tile { display: block; margin-top: 0.15rem; font-weight: 500; color: var(--text-2); font-size: 0.8125rem; line-height: 1.4; }
 .bd-stage { white-space: nowrap; }
-.bd-in .dt, .bd-rec .dt { margin-top: 0.15rem; }
+/* The deploy record sits under the stage, never beside it (it ran into the next column). */
+.bd-stage .dt { display: flex; white-space: normal; }
+.bd-in .dt, .bd-rec .dt, .bd-stage .dt { margin-top: 0.15rem; }
 .lk { display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; align-items: center; }
 .lk + .lk { margin-top: 0.5rem; }
 .lk-t { color: var(--text-2); }
@@ -485,6 +487,8 @@ html { scroll-padding-top: 4.5rem; }
   .ob-table, .ob-table tbody, .ob-table tr, .ob-table th, .ob-table td { display: block; width: auto; }
   .bd-row { padding: 0.25rem 0 0.6rem; border-bottom: var(--deck-hair); }
   .bd-stage { white-space: normal; }
+  /* A tap target of 44 px for each application name (it was the text height, 15 px). */
+  .bd-app a { display: inline-flex; align-items: center; min-height: 2.75rem; }
   .bd-table td, .bd-table th { border: 0; padding: 0.25rem 0.75rem; }
   .ob-table tr { padding: 0.5rem 0; border-bottom: var(--deck-hair); }
   .ob-table td, .ob-table th { border: 0; }

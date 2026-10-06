@@ -334,6 +334,68 @@ html[data-skin="field-station"]:not(.fs-sky-on) .bay > .c-photo { display: none;
   }
 }
 
+/* Session 6 polish (Lens C, astra 3 and 5): fewer decorative marks, so the photograph carries the
+   station; denser board, bays and System at 1280x720. Later rules win over the ones above. */
+html[data-skin="field-station"] .c-code::after { background: linear-gradient(var(--fs-hair-2) 0 0) 0 50% / 100% 1px no-repeat; }
+@media (min-width: 64em) and (min-height: 36em) {
+  html[data-skin="field-station"].js[data-view="stage"] {
+    & .deck::before { background: var(--fs-veil, rgb(1 11 19 / 0.86)); }
+    & .deck::after {
+      background:
+        linear-gradient(var(--c) 0 0) 0 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 0 / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 0 100% / 1px var(--l) no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / var(--l) 1px no-repeat,
+        linear-gradient(var(--c) 0 0) 100% 100% / 1px var(--l) no-repeat;
+    }
+    & .d-label { padding-right: 0; background: none; }
+
+    /* Board: three or more rows in view at 1280x720. */
+    & .c-board .c-head { margin-bottom: 0.6rem; }
+    & .c-board .bd-ratios { margin-bottom: 0.6rem; }
+    & .c-board .ratio { padding: 0.3rem 0.7rem; font-size: 0.875rem; line-height: 1.35; }
+    & .c-board .ratio b { font-size: 1.25rem; }
+    & .c-board .bd-table { font-size: 0.875rem; line-height: 1.4; }
+    & .c-board .bd-table :is(th, td) { padding: 0.4rem 0.55rem; }
+    & .c-board .bd-table thead th { padding-block: 0.35rem; }
+    & .c-board .bd-tile { font-size: 0.75rem; line-height: 1.35; }
+    & .c-board .bd-dom th { padding-top: 0.5rem; }
+    & .c-board .dt-l { font-size: 0.6875rem; }
+    & .c-board .bd-table thead th:nth-child(1) { width: 23%; }
+    & .c-board .bd-table thead th:nth-child(2) { width: 15%; }
+    & .c-board .bd-table thead th:nth-child(3) { width: 13%; }
+    & .c-board .bd-table thead th:nth-child(4) { width: 16%; }
+    & .c-board .bd-lk { font-size: 0.8125rem; line-height: 1.35; }
+    & .c-board .lk + .lk { margin-top: 0.3rem; }
+
+    /* Bays: the open panel starts higher. */
+    & .bay { padding-top: 1rem; }
+    & .bay-h { font-size: clamp(1.625rem, 1.1rem + 1vw, 2rem); margin-bottom: 0.25rem; }
+    & .bay-one { margin-bottom: 0.4rem; font-size: 1rem; line-height: 1.45; }
+    & .bay-meta { margin-bottom: 0.5rem; }
+    & .bay-cav { margin-bottom: 0.6rem; padding-block: 0.45rem; font-size: 0.875rem; line-height: 1.45; }
+    & .pads { margin-bottom: 0.6rem; }
+    & .pad { min-height: 0; padding-block: 0.4rem; }
+    & .pad-s { font-size: 0.8125rem; line-height: 1.35; }
+
+    /* System: the figure fitted, its stepper in view beneath it as one row. */
+    & .c-system .c-head { margin-bottom: 0.6rem; padding-block: 0.5rem; }
+    & .c-system .c-title { font-size: 2rem; }
+    & .c-system .sys-wide { max-height: calc(100dvh - 22rem); }
+    /* The outcome caption and the closed key share one row under the picture. */
+    & .c-system .sy-fig { padding-block: 0.6rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 1.5rem; }
+    & .c-system .sy-fig > :not(.sy-outcap, .sys-keybox), & .c-system .sys-keybox[open] { grid-column: 1 / -1; }
+    & .c-system .sy-outcap { margin: 0.25rem 0 0; }
+    & .c-system .sys-keybox { margin-top: 0.25rem; border: 0; }
+    & .c-system .sy-grid { gap: 0.6rem; }
+    & .c-system .sy-side { grid-template-columns: minmax(0, 1fr); }
+    & .c-system .sy-stepper { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin: 0 0 0.5rem; grid-row: auto; }
+  }
+}
+
 /* Station mode (?station=): the photograph and the frame alone around one console. */
 @media (min-width: 64em) and (min-height: 36em) {
   html[data-skin="field-station"].js[data-station][data-view="stage"] .c-standby .badge { right: 1.25rem; bottom: 1.25rem; }
