@@ -53,6 +53,9 @@
 .dt time, .d-clock time { font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; color: var(--text); }
 .rcpt { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; margin: 0 0 0 0.1rem; padding: 0; border: 1px solid var(--line-ui); background: transparent; color: var(--text-2); cursor: pointer; align-self: center; }
 .rcpt svg { fill: none; stroke: currentColor; stroke-width: 1.2; }
+/* A 44 px touch area around the small receipt control. */
+.rcpt { position: relative; }
+.rcpt::after { content: ""; position: absolute; inset: -10px; }
 .rcpt:hover { color: var(--head); border-color: var(--text-2); }
 .receipt { margin: 0; max-width: min(26rem, calc(100vw - 2rem)); padding: 1rem 1.1rem 0.9rem; border: 1px solid var(--ink-3); background: var(--paper); color: var(--ink); font-weight: 400; font-size: 0.9375rem; line-height: 1.5; box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 0.45); }
 .receipt :focus-visible { outline-color: var(--ink); }
@@ -562,10 +565,8 @@ html { scroll-padding-top: 4.5rem; }
    Ghosted text stays at the AA text-3 level or lighter. */
 .bd-proj, .pj-proj, .t-proj, .sys-L4, .sys-L5 { transition: background-color 550ms var(--deck-ease), border-color 550ms var(--deck-ease), box-shadow 550ms var(--deck-ease); }
 html[data-mode="projected"] :is(.bd-proj, .pj-proj, .t-proj) { border-color: var(--fog); background-color: rgb(207 201 187 / 0.08); box-shadow: 0 0 0 1px rgb(207 201 187 / 0.25); }
-html[data-mode="projected"] :is(.bd-row td, .bd-row .bd-tile, .t-rec .t-t, .pj-today, .bay-one, .fn-t) { color: var(--text-3); }
-html[data-mode="projected"] .bd-row .bd-app a, html[data-mode="projected"] .t-rec time { color: var(--text-2); }
-html[data-mode="projected"] .sys-svg :is(.sys-L1, .sys-L2, .sys-L3) .nm { fill: var(--text-2); }
-html[data-mode="projected"] .sys-svg :is(.sys-L1, .sys-L2, .sys-L3) :is(.dt, .pair-t) { fill: var(--text-3); }
+/* Recorded facts stay at full strength in Projected (astra and Lens A, session 5): only the projected
+   layer gains emphasis, and it never draws hotter than the records it sits beside. */
 html[data-mode="projected"] .sys-svg .trib-plan { opacity: 0.85; }
 html[data-mode="projected"] .sys-svg :is(.svc-box, .tsdf-b) { stroke: var(--fog); }
 html[data-mode="projected"] .d-rc b { color: var(--head); }
@@ -604,6 +605,8 @@ html.js[data-station] .d-pad9, html.js[data-station] .d-foot, html.js[data-stati
   .deck { display: block !important; height: auto !important; }
   .console, .bay, .panel, .sy-tx, .c-photo + .c-frame { display: block !important; content-visibility: visible !important; }
   [hidden="until-found"] { display: block !important; content-visibility: visible !important; }
+  /* A ledger filter never shortens the printed record. */
+  .lg-row[hidden] { display: grid !important; }
   .d-rail, .d-tape, .d-pad9, .d-foot, .d-dock, .d-switch, .d-ctrl, .sy-stepper, .lg-filter, .trace, .rcpt, .skip, .d-keys, .receipt, .decor, .pads, .badge, .sys-keybox summary::after { display: none !important; }
   .d-status { position: static !important; border: 0; padding: 0 0 0.25in; background: none !important; }
   .d-word a, .d-crumb, .d-clock, .d-rc, .d-rc b, .tr-nums b, .tr-leave { color: #000000 !important; }

@@ -170,7 +170,7 @@
   function camera(step, instant) {
     if (!wide || !wide.getClientRects().length) { if (wide) { cam = full.slice(); wide.setAttribute('viewBox', full.join(' ')); } return; }
     // Frame the tiles and domain labels (L1 also carries the date key in the far corner).
-    const to = { 1: () => box('.sys-L1 .sys-app, .sys-L1 .dom'), 2: () => box('.sys-L1 .sys-app, .sys-L1 .dom, .sys-L2'), 3: () => box('.sys-L3'), 4: () => box('.sys-L4'), 5: () => full }[step]();
+    const to = { 1: () => box('.sys-L1 .sys-app, .sys-L1 .dom'), 2: () => box('.sys-L1 .sys-app, .sys-L1 .dom, .sys-L2'), 3: () => box('.sys-L3, .sys-L1 .sys-app'), 4: () => box('.sys-L4'), 5: () => full }[step]();
     cancelAnimationFrame(camRaf);
     const done = () => document.dispatchEvent(new CustomEvent('deck:camera', { detail: { step } }));
     if (instant) { cam = to.slice(); wide.setAttribute('viewBox', cam.join(' ')); done(); return; }
@@ -350,7 +350,9 @@
     const dom = D.domains.find((x) => q.includes(x.id) || q.includes(x.label.toLowerCase()));
     const dm = q.match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?|(\d{4})-(\d\d)-(\d\d)/);
     let ans;
-    if (app) ans = fill(T['deck.ask.ans.app'], { name: app.name, stage: app.stage, date: app.recordUS });
+    // SHIELD is CAST's presentation shell on fictional samples: answer with its own record, never CAST's stage.
+    if (/shield/.test(q) && !/cast/.test(q)) ans = D.shield;
+    else if (app) ans = fill(T['deck.ask.ans.app'], { name: app.name, stage: app.stage, date: app.recordUS });
     else if (dom) ans = fill(T['deck.ask.ans.domain'], { domain: dom.label, list: D.apps.filter((a) => a.domain === dom.id).map((a) => a.name).join(', ') });
     else if (dm) {
       const isoD = dm[4] ? `${dm[4]}-${dm[5]}-${dm[6]}` : `${dm[3] || D.recordsAsOf.slice(0, 4)}-${dm[1].padStart(2, '0')}-${dm[2].padStart(2, '0')}`;

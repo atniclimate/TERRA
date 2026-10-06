@@ -18,12 +18,13 @@ const CTL = 'a, button, input, form, .d-switch, .pads, .bd-scroll, .ob-scroll';
 // 5x7 digits: seven rows of five bits
 const FONT = '0E11131519110E040C040404040E0E11010204081F1F02040201110E02060A121F02021F101E0101110E0608101E11110E1F0102040808080E11110E11110E0E11110F01020C';
 // grid, grid under content, wake 1-3, code, outline (fog-2, stone, fog on ATNI black)
-const C = ['rgb(177 177 172/.3)', 'rgb(177 177 172/.12)', 'rgb(149 154 156/.55)', 'rgb(177 177 172/.62)', 'rgb(207 201 187/.7)', 'rgb(185 192 198/.66)', 'rgb(207 201 187/.95)'];
+const C = ['rgb(177 177 172/.3)', 'rgb(177 177 172/.12)', 'rgb(149 154 156/.55)', 'rgb(177 177 172/.62)', 'rgb(207 201 187/.7)', 'rgb(185 192 198/.66)', 'rgb(207 201 187/.62)'];
 const RW = [1.5, 2.1, 2.8];
 const store = (v) => { try { if (v) localStorage.setItem(KEY, v); return localStorage.getItem(KEY); } catch (e) { return null; } };
 const seen = (e) => (e.checkVisibility ? e.checkVisibility() : !e.closest('[hidden]'));
 const ease = (t) => 1 - M.pow(1 - t, 5);
-let motion = store() ? store() === 'on' : !mqR.matches;
+// Reduced motion always wins over a stored preference (contract: dot wake off under reduced motion).
+let motion = !mqR.matches && store() !== 'off';
 let W = 0, Ht = 0, P = 16, cols = 0, rows = 0, N = 0, ox = 0, oy = 0, fr = null, img = null;
 let x, y, fx, fy, tx, ty, a, kind, pk, blk, gl, hc, hr;
 let live = false, raf = 0, last = 0, mig = -1, vis = true, follow = 0, waking = false, ptr = null, bx = 0, by = 0, spd = 0, lastIn = 0;
@@ -144,7 +145,8 @@ function draw(k) {
     else dot(G[blk[i] === 1 ? 1 : 0], X, Y, 1);
   }
   HT.forEach((p, q) => { ctx.fillStyle = PAL[q - 1]; ctx.fill(p); });
-  const F = C.concat(`rgb(207 201 187/${0.3 + 0.65 * k})`, `rgb(207 201 187/${0.95 - 0.65 * k})`);
+  // Projected outlines never draw hotter than recorded work (Lens A): peak alpha at the console-code level.
+  const F = C.concat(`rgb(207 201 187/${0.3 + 0.32 * k})`, `rgb(207 201 187/${0.62 - 0.32 * k})`);
   G.forEach((p, j) => { ctx.fillStyle = F[j]; ctx.fill(p); });
 }
 
