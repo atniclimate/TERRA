@@ -1,0 +1,1 @@
+{"css": ["skin.css"], "js": ["skin.js"], "view": "stage", "decor": {"deck_start": "<canvas class=\"dm-cv\" width=\"0\" height=\"0\"></canvas>"}}
