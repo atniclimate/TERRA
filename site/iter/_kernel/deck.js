@@ -319,6 +319,7 @@
     const act = t.dataset.act;
     if (act === 'keys') return openKeys();
     if (act === 'shortcuts') return setShortcuts(!shortcuts);
+    if (act === 'load-frame') return loadFrame(t);
     const nav = { 'sys-prev': { console: 'system', step: st.step - 1 }, 'sys-next': { console: 'system', step: st.step + 1 }, 'tl-prev': { console: 'timeline', tl: st.tl - 1 }, 'tl-next': { console: 'timeline', tl: st.tl + 1 }, 'sv-prev': { console: 'sovereignty', tier: st.tier - 1 }, 'sv-next': { console: 'sovereignty', tier: st.tier + 1 } }[act];
     if (nav) {
       const n = { console: nav.console, step: clamp(nav.step ?? st.step, 1, 5), tl: clamp(nav.tl ?? st.tl, 0, D.records.length - 1), tier: clamp(nav.tier ?? st.tier, 0, 3) };
@@ -335,6 +336,13 @@
     const same = r.console === st.console && (r.console !== 'apps' || r.app === st.app);
     go(r, { from: t.closest('.d-pad9') ? t : null, console: !same, pad: !!r.pad, focus: !t.classList.contains('pad') });
   });
+  // A live demo that queries outside services loads only on request; focus moves into it.
+  function loadFrame(btn) {
+    const fig = btn.closest('figure'), f = fig.querySelector('iframe[data-load]'), s = fig.querySelector('[data-loaded]');
+    f.src = f.dataset.load; f.hidden = false; btn.hidden = true;
+    s.textContent = s.dataset.loaded;
+    f.focus();
+  }
   function filter(btn) {
     const k = btn.dataset.filter, kinds = { recorded: 'solid', demo: 'dashed', planned: 'dotted' };
     for (const b of $$('[data-filter]')) b.setAttribute('aria-pressed', String(b === btn));

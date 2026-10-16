@@ -309,10 +309,11 @@ html[data-skin="field-station"]:not(.fs-sky-on) .bay > .c-photo { display: none;
     /* Text-heavy consoles read on a deep veil; their head is a quiet HUD band. */
     & .c-board .c-head, & .c-timeline .c-head, & .c-objectives .c-head { margin-bottom: 1rem; }
     & .c-board .bd-table { table-layout: fixed; }
-    & .c-board .bd-table thead th:nth-child(1) { width: 26%; }
-    & .c-board .bd-table thead th:nth-child(2) { width: 15%; }
-    & .c-board .bd-table thead th:nth-child(3) { width: 16%; }
+    & .c-board .bd-table thead th:nth-child(1) { width: 22%; }
+    & .c-board .bd-table thead th:nth-child(2) { width: 13%; }
+    & .c-board .bd-table thead th:nth-child(3) { width: 14%; }
     & .c-board .bd-table thead th:nth-child(4) { width: 18%; }
+    & .c-board .bd-table thead th:nth-child(5) { width: 15%; }
     & .c-board .bd-stage { white-space: normal; }
     & .c-board .bd-table :is(th, td) { padding: 0.5rem 0.6rem; }
     & .c-board .bd-app a { font-size: 0.9375rem; }
@@ -366,10 +367,11 @@ html[data-skin="field-station"] .c-code::after { background: linear-gradient(var
     & .c-board .bd-tile { font-size: 0.75rem; line-height: 1.35; }
     & .c-board .bd-dom th { padding-top: 0.5rem; }
     & .c-board .dt-l { font-size: 0.6875rem; }
-    & .c-board .bd-table thead th:nth-child(1) { width: 23%; }
-    & .c-board .bd-table thead th:nth-child(2) { width: 15%; }
-    & .c-board .bd-table thead th:nth-child(3) { width: 13%; }
-    & .c-board .bd-table thead th:nth-child(4) { width: 16%; }
+    & .c-board .bd-table thead th:nth-child(1) { width: 20%; }
+    & .c-board .bd-table thead th:nth-child(2) { width: 13%; }
+    & .c-board .bd-table thead th:nth-child(3) { width: 12%; }
+    & .c-board .bd-table thead th:nth-child(4) { width: 18%; }
+    & .c-board .bd-table thead th:nth-child(5) { width: 14%; }
     & .c-board .bd-lk { font-size: 0.8125rem; line-height: 1.35; }
     & .c-board .lk + .lk { margin-top: 0.3rem; }
 

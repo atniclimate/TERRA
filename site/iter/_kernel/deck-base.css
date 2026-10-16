@@ -327,6 +327,11 @@ html:not(.js) .d-ctrl, html:not(.js) .sy-stepper, html:not(.js) .lg-filter { dis
 .gb3d-cr .nw { white-space: nowrap; }
 .gb3d-cr { margin: 0; font-size: 0.75rem; color: var(--text-2); max-width: 90ch; }
 @media (max-width: 30em) { .gb3d-frame { aspect-ratio: 4 / 3; } }
+.ps-act { margin: 0.5rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; }
+.ps-act [hidden] { display: none; }
+/* The live demo needs room for its own controls; the still keeps 16:9. */
+.ps-live .gb3d-frame:has(iframe:not([hidden])) { aspect-ratio: auto; height: min(78vh, 52rem); max-height: none; }
+.ps-live .gb3d-frame iframe { background: var(--ground); }
 .pn-h { margin: 0 0 0.75rem; display: flex; gap: 0.6rem; align-items: baseline; font-size: 1.0625rem; color: var(--head); }
 .pn-k { font-size: 0.8125rem; color: var(--red-on-dark); font-variant-numeric: tabular-nums; }
 .pn-status { display: block; }
@@ -499,6 +504,8 @@ html { scroll-padding-top: 4.5rem; }
   .ob-table, .ob-table tbody, .ob-table tr, .ob-table th, .ob-table td { display: block; width: auto; }
   .bd-row { padding: 0.25rem 0 0.6rem; border-bottom: var(--deck-hair); }
   .bd-stage { white-space: normal; }
+  /* The column head is hidden when stacked; the cell names itself. */
+  .bd-next::before { content: attr(data-label) ": "; font-family: var(--display); font-weight: 600; color: var(--text-2); }
   /* A tap target of 44 px for each application name (it was the text height, 15 px). */
   .bd-app a { display: inline-flex; align-items: center; min-height: 2.75rem; }
   .bd-table td, .bd-table th { border: 0; padding: 0.25rem 0.75rem; }
