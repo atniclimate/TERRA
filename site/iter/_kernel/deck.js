@@ -155,6 +155,8 @@
       const head = from && $(`#bay-${st.app} .bay-head`);
       if (head) { head.style.viewTransitionName = 'bayframe'; vt.finished.finally(() => { head.style.viewTransitionName = ''; }); }
     });
+    // A newer navigation may skip the animation while its DOM update still completes.
+    vt.ready.catch(error => { if (error.name !== 'AbortError') throw error; });
   }
 
   // ---------------------------------------------------------------- the stage camera (viewBox moves)
@@ -385,8 +387,21 @@
   });
 
   // ---------------------------------------------------------------- history, find-in-page, print, media
-  addEventListener('popstate', () => { const r = parse(location.hash); if (r) apply(r, { focus: true }); });
-  addEventListener('hashchange', () => { const r = parse(location.hash); if (r && hashOf({ ...st, ...r }) !== hashOf(st)) apply(r, { focus: true }); });
+  function restoreLocation() {
+    const mode = new URLSearchParams(location.search).get('mode') === 'projected' ? 'projected' : 'today';
+    if (H.dataset.mode !== mode) setMode(mode);
+    const r = parse(location.hash);
+    if (!r) return;
+    if (H.dataset.station && IDS.includes(H.dataset.station) && !location.hash) r.console = H.dataset.station;
+    // Omitted route values mean the same defaults as a fresh load, not the last selection.
+    if (r.console === 'apps') { r.app ??= APPS[0]; r.pad ??= 'today'; }
+    if (r.console === 'system') r.step ??= 5;
+    if (r.console === 'timeline') r.tl ??= D.records.length - 1;
+    if (r.console === 'sovereignty') r.tier ??= 3;
+    if (hashOf({ ...st, ...r }) !== hashOf(st)) apply(r, { focus: true });
+  }
+  addEventListener('popstate', restoreLocation);
+  addEventListener('hashchange', restoreLocation);
   document.addEventListener('beforematch', (e) => {
     const el = e.target;
     const r = el.classList.contains('console') ? { console: el.dataset.console } : el.classList.contains('bay') ? { console: 'apps', app: el.dataset.app }
